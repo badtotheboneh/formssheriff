@@ -16,9 +16,9 @@ legend{background:var(--acc);color:#fff;font-weight:600;padding:5px 12px;border-
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px 16px;margin-top:10px}
 .big{grid-column:1/-1}
 label{display:block;font-weight:600;font-size:14px;margin-bottom:4px}
-input,textarea{width:100%;font:inherit;padding:8px 10px;border:1px solid #b9c0b6;border-radius:4px;background:#fbfcfb;color:var(--ink)}
+input,textarea,select{width:100%;font:inherit;padding:8px 10px;border:1px solid #b9c0b6;border-radius:4px;background:#fbfcfb;color:var(--ink)}
 textarea{min-height:84px;resize:vertical}
-input:focus,textarea:focus,button:focus-visible,summary:focus-visible{outline:3px solid #9fc2a6;outline-offset:1px}
+input:focus,textarea:focus,select:focus,button:focus-visible,summary:focus-visible{outline:3px solid #9fc2a6;outline-offset:1px}
 .bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:12px 16px;display:flex;gap:14px;align-items:center;justify-content:center;flex-wrap:wrap}
 button{font:inherit;font-weight:600;background:var(--acc);color:#fff;border:0;border-radius:4px;padding:10px 20px;cursor:pointer}
 button:hover{background:var(--acc2)}
@@ -26,16 +26,24 @@ button:hover{background:var(--acc2)}
 details{margin-top:8px}
 summary{cursor:pointer;color:var(--mute)}
 #out{min-height:220px;font:13px/1.35 Consolas,monospace;margin-top:8px}
+[hidden]{display:none!important}
+input[type=checkbox]{width:auto}
+.stack{display:grid;gap:8px}
+.qrow{display:flex;align-items:center;gap:8px;font-weight:400;margin:0}
+.qrow input[type=date]{width:auto;margin-left:auto;padding:4px 8px}
+.err{color:#b3261e;font-size:13px;min-height:0;margin-top:3px}
+.ghost{background:none;color:var(--acc);border:1px solid var(--acc)}
+.ghost:hover{background:#e3e9e3}
 </style>
 </head>
 <body>
 <main>
 <h1>Запрос на восстановление</h1>
-<p class="lead">Заполните поля, нажмите «Скопировать ББ-код». Затем на форуме переключите редактор в режим ББ-кода (кнопка <b>[ ]</b>) и вставьте текст. Пустые поля превратятся в «-».</p>
+<p class="lead">Заполните поля, нажмите «Скопировать ББ-код». Затем на форуме переключите редактор в режим ББ-кода (кнопка <b>[ ]</b>) и вставьте текст. Поля со звёздочкой обязательны. Даты и имена приводятся к единому виду автоматически, черновик сохраняется в вашем браузере.</p>
 <form id="f" onsubmit="return false"></form>
 <details><summary>Показать готовый ББ-код</summary><textarea id="out" readonly></textarea></details>
 </main>
-<div class="bar"><button id="copy" type="button">Скопировать ББ-код</button><span id="st"></span></div>
+<div class="bar"><button id="copy" type="button">Скопировать ББ-код</button><button id="clear" type="button" class="ghost">Очистить</button><span id="st"></span></div>
 
 <script>
 /* Шаблон заявки. Всё, что в {фигурных скобках}, автоматически становится полем формы.
@@ -62,43 +70,107 @@ for(const m of T.matchAll(/\{([^}]*)\}/g)){
   });
 }
 
-const vals=[];
-const form=document.getElementById('f'),out=document.getElementById('out'),st=document.getElementById('st');
-let curSec=null,grid=null;
+const MON=['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
+const QUALS=['FTO','BSS','OSS Training','Gang Deputy Certificate','Gang Investigator Certificate']; // список квалификаций: правьте здесь
+const REASONS=['Выгорание','Личные обстоятельства','Перевод в другое агентство','Выход на пенсию','Другое'];
+const KEY='lscsd-reinst-v1',URLRE=/^https?:\/\/\S+$/i;
+const today=new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const fmt=v=>{if(!v)return'';const[y,m,d]=v.split('-');return `${d}/${MON[m-1]}/${y}`};
+const cap=s=>s.trim().replace(/\s+/g,' ').replace(/(^|[\s-])(\S)/g,(a,b,c)=>b+c.toUpperCase());
+const E=(t,p={},...k)=>{const e=document.createElement(t);Object.assign(e,p);e.append(...k);return e};
+const $=id=>document.getElementById(id);
+
+function spec(f){const L=f.label,S=f.sec;
+ if(L=='Дата подачи')return{k:'date',today:1,req:1};
+ if(L=='Дата ухода')return S.includes('2')?{k:'date',req:1}:{k:'date',def:'N/A'};
+ if(S.includes('3'))return{def:'N/A'};
+ if(L=='Имя'||L=='Фамилия')return{k:'name',req:1};
+ if(L=='Второе имя')return{k:'name'};
+ if(L=='Полных лет')return{k:'num',req:1};
+ if(L=='Супервайзер'||L.startsWith('Выговоры'))return{k:'sel',opts:['Нет','Да'],req:1};
+ if(/^(Привлекались|Есть ли медицинские|Проводились)/.test(L))return{k:'yn',ph:'Опишите подробнее',req:1};
+ if(L=='Квалификации')return{k:'quals'};
+ if(L=='Причина ухода в отставку')return{k:'reason',req:1};
+ if(L.startsWith('Нынешняя фракция'))return{k:'sel',opts:['-','Crime','Civil','SAES']};
+ if(L.startsWith('Знакомые'))return{k:'yn',ph:'Кто именно',raw:1};
+ if(L.startsWith('Double'))return{k:'yn',ph:'Ссылка на одобрение (https://…)',url:1,raw:1,no:'-'};
+ if(L.startsWith('ЧС фракций'))return{k:'yn',ph:'Какие фракции',raw:1,no:'-'};
+ if(L.startsWith('Форумный'))return{k:'url',must:'forum.gambit-rp.com/members/',req:1};
+ if(L.startsWith('Ссылка на приказ'))return{k:'url'};
+ if(L.startsWith('Скриншот'))return{k:'url',req:1};
+ if(L.startsWith('Демонстрация'))return{k:'urls',req:1};
+ if(L.startsWith('Все игровые'))return{k:'lines',req:1};
+ if(/^(Прошлая должность|Последнее звание|Желаемая|Краткое описание)/.test(L))return{req:1};
+ return{};
+}
+
+function make(f,s){
+ const k=s.k,one=(el,get,bad=()=>'')=>({node:el,get,st:()=>el.value,ld:v=>{el.value=v||''},bad});
+ if(k=='date'){const el=E('input',{type:'date',max:today});return{node:el,get:()=>fmt(el.value),st:()=>s.today?'':el.value,ld:v=>{el.value=v||(s.today?today:'')},bad:()=>''}}
+ if(k=='num'){const el=E('input',{type:'number',min:18,max:99,inputMode:'numeric',placeholder:f.hint});return one(el,()=>el.value.trim(),()=>el.value&&(el.value<18||el.value>99)?'Возраст от 18 до 99':'')}
+ if(k=='name'){const el=E('input',{type:'text',placeholder:f.hint});return one(el,()=>cap(el.value))}
+ if(k=='url'){const el=E('input',{type:'url',placeholder:'https://'});return one(el,()=>el.value.trim(),()=>{const v=el.value.trim();return v&&!URLRE.test(v)?'Нужна ссылка вида https://…':v&&s.must&&!v.includes(s.must)?'Ожидается ссылка на профиль: '+s.must+'…':''})}
+ if(k=='urls'||k=='lines'){const el=E('textarea',{placeholder:k=='urls'?'Каждая ссылка с новой строки':'Каждый персонаж с новой строки'});const ls=()=>el.value.split('\n').map(x=>x.trim()).filter(Boolean);return one(el,()=>ls().join('\n'),()=>{if(k=='lines')return'';const i=ls().findIndex(x=>!URLRE.test(x));return i<0?'':`Строка ${i+1} не похожа на ссылку (нужно https://…)`})}
+ if(k=='sel'){const el=E('select',{},...(s.req?[E('option',{value:''},'Выберите…')]:[]),...s.opts.map(x=>E('option',{value:x},x)));const r=one(el,()=>el.value);r.ld=v=>{el.value=v||(s.req?'':s.opts[0])};return r}
+ if(k=='yn'){
+  const sel=E('select',{},E('option',{value:'Нет'},'Нет'),E('option',{value:'Да'},'Да'));
+  const d=s.url?E('input',{type:'url',placeholder:s.ph}):E('textarea',{placeholder:s.ph});d.hidden=true;
+  const show=()=>{d.hidden=sel.value!='Да'},dv=()=>d.value.trim();sel.onchange=show;
+  return{node:E('div',{className:'stack'},sel,d),
+   get:()=>sel.value!='Да'?(s.no||'Нет'):s.raw?(dv()||'Да'):dv()?`Да ((${dv()}))`:'Да',
+   st:()=>[sel.value,d.value],ld:v=>{sel.value=v?v[0]:'Нет';d.value=v?v[1]:'';show()},
+   bad:()=>sel.value=='Да'?(!dv()?'Опишите подробности':s.url&&!URLRE.test(dv())?'Нужна ссылка вида https://…':''):''}}
+ if(k=='quals'){
+  const rows=QUALS.map(q=>{const cb=E('input',{type:'checkbox'}),dt=E('input',{type:'date',max:today,hidden:true,title:'Дата последнего подтверждения'});cb.onchange=()=>{dt.hidden=!cb.checked};return{q,cb,dt,node:E('label',{className:'qrow'},cb,q,dt)}});
+  const oth=E('input',{type:'text',placeholder:'Другие квалификации (через запятую)'});
+  return{node:E('div',{className:'stack'},...rows.map(r=>r.node),oth),
+   get:()=>rows.filter(r=>r.cb.checked).map(r=>r.q+(r.dt.value?` (${fmt(r.dt.value)})`:'')).concat(oth.value.trim()||[]).join(', '),
+   st:()=>[rows.map(r=>[r.cb.checked,r.dt.value]),oth.value],
+   ld:v=>{rows.forEach((r,i)=>{r.cb.checked=!!(v&&v[0][i]&&v[0][i][0]);r.dt.value=v&&v[0][i]?v[0][i][1]:'';r.dt.hidden=!r.cb.checked});oth.value=v?v[1]:''},bad:()=>''}}
+ if(k=='reason'){
+  const sel=E('select',{},E('option',{value:''},'Выберите…'),...REASONS.map(x=>E('option',{value:x},x)));
+  const d=E('textarea',{placeholder:'Поясните подробнее'});
+  return{node:E('div',{className:'stack'},sel,d),get:()=>sel.value?sel.value+(d.value.trim()?'. '+d.value.trim():''):'',
+   st:()=>[sel.value,d.value],ld:v=>{sel.value=v?v[0]:'';d.value=v?v[1]:''},
+   bad:()=>sel.value=='Другое'&&!d.value.trim()?'Поясните причину':''}}
+ const el=E(f.big?'textarea':'input',{placeholder:f.hint});return one(el,()=>el.value.trim());
+}
+
+const form=$('f'),out=$('out'),st=$('st'),ctls=[];
+let curSec=null,grid=null,tried=false;
 for(const f of fields){
   if(f.sec!==curSec){
     curSec=f.sec;
-    const fs=document.createElement('fieldset');
-    fs.innerHTML='<legend></legend><div class="grid"></div>';
-    fs.querySelector('legend').textContent=curSec;
-    form.appendChild(fs);grid=fs.querySelector('.grid');
+    const fs=E('fieldset',{},E('legend',{},curSec),grid=E('div',{className:'grid'}));
+    form.appendChild(fs);
   }
-  const w=document.createElement('div');
-  if(f.big)w.className='big';
-  const id='f'+f.i;
-  const l=document.createElement('label');l.htmlFor=id;l.textContent=f.label;
-  const el=document.createElement(f.big?'textarea':'input');
-  el.id=id;el.placeholder=f.hint;if(!f.big)el.type='text';
-  el.addEventListener('input',()=>{vals[f.i]=el.value.trim();update()});
-  w.append(l,el);grid.appendChild(w);
+  const s=spec(f),c=make(f,s);c.s=s;c.f=f;
+  const lab=E('label',{},f.label+(s.req?' *':'')),err=E('div',{className:'err'});
+  if(['INPUT','TEXTAREA','SELECT'].includes(c.node.tagName)){c.node.id='f'+f.i;lab.htmlFor=c.node.id}
+  grid.appendChild(E('div',{className:f.big||s.k=='quals'||s.k=='reason'?'big':''},lab,c.node,err));
+  c.err=err;ctls.push(c);
 }
-
-function build(){
-  let o='',p=0;
-  for(const f of fields){o+=T.slice(p,f.idx)+(vals[f.i]||'-');p=f.idx+f.len}
-  return o+T.slice(p);
-}
+const val=c=>c.get()||c.s.def||'-';
+const problem=c=>c.s.req&&!c.get()?'Обязательное поле':c.bad();
+function build(){let o='',p=0;ctls.forEach(c=>{o+=T.slice(p,c.f.idx)+val(c);p=c.f.idx+c.f.len});return o+T.slice(p)}
 function update(){
   out.value=build();
-  const empty=fields.filter(f=>!vals[f.i]).length;
-  st.textContent=empty?`Не заполнено полей: ${empty} из ${fields.length}`:'Все поля заполнены';
+  let n=0,first=null;
+  ctls.forEach(c=>{const m=problem(c);c.err.textContent=tried?m:'';if(m){n++;first=first||c}});
+  st.textContent=n?`Нужно заполнить или исправить: ${n}`:'Всё готово, можно копировать';
+  return{n,first};
 }
-document.getElementById('copy').addEventListener('click',async()=>{
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(ctls.map(c=>c.st())))}catch(e){}};
+try{const d=JSON.parse(localStorage.getItem(KEY));ctls.forEach((c,i)=>c.ld(d?d[i]:undefined))}catch(e){ctls.forEach(c=>c.ld())}
+['input','change'].forEach(ev=>form.addEventListener(ev,()=>{save();update()}));
+$('copy').onclick=async()=>{
+  tried=true;const r=update();
+  if(r.n){r.first.err.scrollIntoView({block:'center',behavior:'smooth'});return}
   const text=build();
-  try{await navigator.clipboard.writeText(text)}
-  catch(e){out.value=text;out.select();document.execCommand('copy')}
+  try{await navigator.clipboard.writeText(text)}catch(e){out.value=text;out.select();document.execCommand('copy')}
   st.textContent='Скопировано. Вставьте в редактор в режиме [ ]';
-});
+};
+$('clear').onclick=()=>{if(confirm('Очистить все поля?')){tried=false;ctls.forEach(c=>c.ld());save();update()}};
 update();
 </script>
 </body>
