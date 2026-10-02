@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Формы ответов: восстановление в LSCSD</title>
+<style>
+:root{--bg:#eef0ec;--card:#fff;--ink:#1a202c;--mute:#5d6770;--line:#d5d9d2;--acc:#344434;--acc2:#4b6350}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Segoe UI",Roboto,Arial,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 96px}
+h1{font-size:26px;margin:0 0 6px}
+.lead{margin:0 0 18px;color:var(--mute)}
+.nav{display:inline-block;margin-bottom:10px;color:var(--acc);font-weight:600}
+.pick{display:flex;gap:8px;align-items:center;margin-bottom:16px}
+.pick select{flex:1;font-weight:600}
+#cnt{color:var(--mute);font-size:14px;min-width:48px;text-align:right}
+fieldset{background:var(--card);border:1px solid var(--line);border-radius:6px;margin:0 0 16px;padding:8px 18px 18px}
+legend{background:var(--acc);color:#fff;font-weight:600;padding:5px 12px;border-radius:4px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px 16px;margin-top:10px}
+.big{grid-column:1/-1}
+label{display:block;font-weight:600;font-size:14px;margin-bottom:4px}
+input,textarea,select{width:100%;font:inherit;padding:8px 10px;border:1px solid #b9c0b6;border-radius:4px;background:#fbfcfb;color:var(--ink)}
+textarea{min-height:100px;resize:vertical}
+input:focus,textarea:focus,select:focus,button:focus-visible,summary:focus-visible{outline:3px solid #9fc2a6;outline-offset:1px}
+.err{color:#b3261e;font-size:13px;margin-top:3px}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:12px 16px;display:flex;gap:14px;align-items:center;justify-content:center;flex-wrap:wrap}
+button{font:inherit;font-weight:600;background:var(--acc);color:#fff;border:0;border-radius:4px;padding:10px 20px;cursor:pointer}
+button:hover{background:var(--acc2)}
+.ghost{background:none;color:var(--acc);border:1px solid var(--acc);padding:8px 16px}
+.ghost:hover{background:#e3e9e3}
+#st{color:var(--mute);font-size:14px}
+details{margin-top:8px}
+summary{cursor:pointer;color:var(--mute)}
+#out{min-height:240px;font:13px/1.35 Consolas,monospace;margin-top:8px}
+</style>
+</head>
+<body>
+<main>
+<a class="nav" href="index.html">← Генератор заявки</a>
+<h1>Ответы по заявкам</h1>
+<p class="lead">Выберите форму ответа стрелками или из списка, заполните поля и скопируйте ББ-код. Общие поля (кому, подразделение, подпись) запоминаются и подставляются во все формы.</p>
+<div class="pick"><button id="prev" class="ghost" type="button" aria-label="Предыдущая форма">‹</button><select id="sel" aria-label="Форма ответа"></select><button id="next" class="ghost" type="button" aria-label="Следующая форма">›</button><span id="cnt"></span></div>
+<form id="f" onsubmit="return false"></form>
+<details><summary>Показать готовый ББ-код</summary><textarea id="out" readonly></textarea></details>
+</main>
+<div class="bar"><button id="copy" type="button">Скопировать ББ-код</button><button id="clear" type="button" class="ghost">Очистить поля</button><span id="st"></span></div>
+
+<script>
+/* В шаблонах {Поле} становится полем формы. Варианты: {Поле|date}, {Поле|area}, {Поле||значение по умолчанию}.
+   Одинаковые названия полей в разных формах заполняются один раз и запоминаются. */
+const NAME="LOS SANTOS COUNTY SHERIFF`S DEPARTMENT";
+const MON=['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
+const HDR=`[BLOCK=#edf2f7][CENTER][IMG width="100px"]https://i.imgur.com/1IZekQj.png[/IMG]\n[FONT=Arial][SIZE=4][B]${NAME}[/B][/SIZE]\n[SIZE=2][COLOR=#4a5568]PERSONNEL BUREAU / REINSTATEMENT PROGRAM[/COLOR][/SIZE][/FONT][/CENTER][/BLOCK]`;
+const FTR=`[BLOCK=#344434][CENTER][SIZE=1][COLOR=#ffffff]${NAME} / 100 WEST 1ST STREET, DILLIMORE, SA[/COLOR][/SIZE][/CENTER][/BLOCK]`;
+const doc=(...p)=>`[SIZE=3][COLOR=#1a202c]${HDR}${p.join('')}${FTR}[/COLOR][/SIZE]`;
+const head=(ru,en,from,col)=>`[BLOCK=#ffffff][CENTER][SIZE=4][B]${col?`[COLOR=${col}]${ru}[/COLOR]`:ru}[/B][/SIZE][SIZE=2][COLOR=#718096] ${en}[/COLOR][/SIZE][/CENTER][TABLE2][TR2][TD2][B]КОМУ:[/B] {Кому}[/TD2][TD2][B]ОТ:[/B] ${from}[/TD2][TD2][B]ДАТА:[/B] {Дата|date}[/TD2][/TR2][/TABLE2][/BLOCK]`;
+const sec=t=>`[BLOCK=#344434][COLOR=#ffffff][B]${t}[/B][/COLOR][/BLOCK]`;
+const note=t=>`[BLOCK=#FFFECD][SIZE=2]${t}[/SIZE][/BLOCK]`;
+const sign='[RIGHT][SIZE=4]{Подписант}[/SIZE]\n[SIZE=2][B]{Должность подписанта}[/B][/SIZE][/RIGHT]';
+
+const FORMS=[
+{n:'Запрос получен',t:doc(
+ head('ЗАПРОС НА ВОССТАНОВЛЕНИЕ - ПОЛУЧЕН','REINSTATEMENT REQUEST RECEIVED','Personnel Bureau'),
+ `[BLOCK=#f7fafc]${sec('СТАТУС ОБРАЩЕНИЯ')}Ваш запрос на восстановление зарегистрирован и принят к первичной проверке.\nНа текущем этапе проводится верификация предоставленных данных, служебной истории и оснований для возвращения на службу.\n[B]ТЕКУЩИЙ СТАТУС:[/B] [COLOR=#2b6cb0][B]ПОЛУЧЕНО / НА ПРОВЕРКЕ[/B][/COLOR][/BLOCK]`,
+ `[BLOCK=#ffffff]Если потребуется уточнение информации, с вами свяжутся отдельно в личных сообщениях или по каналам департамента.\nПожалуйста, ожидайте итогового решения и не создавайте дублирующих заявок до завершения текущей проверки.\n${sign}[/BLOCK]`)},
+
+{n:'Вердикт: восстановлен',t:doc(
+ head('ЗАПРОС НА ВОССТАНОВЛЕНИЕ - ВЕРДИКТ','REINSTATEMENT REQUEST DECISION','Personnel Division'),
+ `[BLOCK=#f7fafc]${sec('ИНФОРМАЦИЯ О ВОССТАНОВЛЕНИИ')}Мы рассмотрели ваше заявление и рады официально поприветствовать вас снова в стенах департамента шерифа округа Лос-Сантос.\nВы восстанавливаетесь в звании [B]{Звание}[/B] на должность [B]{Должность}[/B] в подразделение [B]{Подразделение}[/B].\nОжидается, что вы в кратчайшие сроки ознакомитесь с актуальной нормативно-правовой базой и внутренними регламентами департамента.\nПо завершении ознакомления вам необходимо связаться с руководством подразделения [B]{Подразделение}[/B] для получения дальнейших инструкций и распоряжений.[/BLOCK]`,
+ `[BLOCK=#ffffff]${note('[B]ВНЕИГРОВАЯ ИНФОРМАЦИЯ:[/B] Для успешного возвращения во фракцию выполните следующие шаги:')}[LIST][*][URL=https://discord.gg/83YFGdUHmx]Получить роли во фракционном Discord[/URL][*][URL=https://sa-es.su/forums/law-act/]Изучить действующую законодательную базу[/URL][*][URL=https://saes.su/forums/1780/]Ознакомиться с руководством подразделения[/URL][/LIST]После настройки ролей отпишите в личные сообщения руководству вашего подразделения для инвайта в игре.\n${sign}[/BLOCK]`)},
+
+{n:'Отказ',t:doc(
+ head('ЗАПРОС НА ВОССТАНОВЛЕНИЕ - ОТКЛОНЕН','REINSTATEMENT REQUEST DECLINED','Personnel Division'),
+ `[BLOCK=#f1f5f2]${sec('РЕШЕНИЕ ПО ЗАЯВКЕ')}По результатам рассмотрения вашего обращения принято решение отказать в восстановлении на текущем этапе.\n[B]РЕГ. НОМЕР ОБРАЩЕНИЯ:[/B] #{Рег. номер}\n[B]ТЕКУЩИЙ СТАТУС:[/B] [COLOR=#c53030][B]ОТКЛОНЕНО[/B][/COLOR]\n[B]ПРИЧИНА ОТКАЗА:[/B]\n{Причина отказа|area}\n[B]ПОВТОРНАЯ ПОДАЧА ВОЗМОЖНА С:[/B] {Повторная подача с|date}[/BLOCK]`,
+ `[BLOCK=#ffffff]Вы можете подать новое заявление после устранения причин отказа и по истечении установленного срока повторной подачи.\nПри повторном обращении рекомендуем приложить обновленные данные и подтверждающие материалы, которые повышают шансы на положительное решение.\n${sign}[/BLOCK]`)},
+
+{n:'На доработке',t:doc(
+ head('ЗАПРОС НА ВОССТАНОВЛЕНИЕ - НА ДОРАБОТКЕ','REINSTATEMENT REQUEST – PENDING CHANGES','Personnel Division','#B22222'),
+ `[BLOCK=#f7fafc][B][COLOR=#B22222]СТАТУС: ТРЕБУЮТСЯ ПРАВКИ[/COLOR][/B]\nМы рассмотрели ваше заявление на восстановление. В текущей версии обнаружены недочеты, которые требуют исправления до того, как мы сможем продолжить рассмотрение.[BLOCK=#FFF0F0][B]Замечания:[/B]\n{Замечания|area}[/BLOCK]Для продолжения процедуры восстановления вам необходимо внести правки в соответствии с замечаниями выше и повторно подать заявку.\nПосле внесения изменений, пожалуйста, уведомите отдел кадров о готовности заявки к повторной проверке.[/BLOCK]`,
+ `[BLOCK=#ffffff]${note('[B]ВНЕИГРОВАЯ ИНФОРМАЦИЯ:[/B] Для успешного внесения правок следуйте инструкциям:')}[LIST][*]Внимательно изучите список замечаний, указанный выше.[*]Отредактируйте текст вашей заявки в соответствии с требованиями.[/LIST]Срок на исправление замечаний: [B]{Срок на исправление||24 часа}[/B] с момента получения данного уведомления.\n${sign}[/BLOCK]`)},
+
+{n:'Альтернативная должность',t:doc(
+ head('ПРЕДЛОЖЕНИЕ АЛЬТЕРНАТИВНОЙ ДОЛЖНОСТИ','ALTERNATIVE POSITION OFFER NOTICE','Personnel Bureau'),
+ `[BLOCK=#f7fafc]${sec('ОФИЦИАЛЬНОЕ УВЕДОМЛЕНИЕ')}Департамент шерифа округа Лос-Сантос завершил проверку вашего обращения о восстановлении на службу.\nПо организационным причинам ранее заявленная должность [B]{Прежняя должность}[/B] не может быть предоставлена на текущем этапе.\nВ качестве альтернативы департамент готов предложить вам должность [B]{Альтернативная должность}[/B] в подразделении [B]{Подразделение}[/B].\nПредложение сохраняет возможность дальнейшего карьерного роста и перевода по внутренней процедуре после прохождения установленного периода службы.[TABLE2][TR2][TD2][B]ПРЕДЛОЖЕННАЯ ДОЛЖНОСТЬ:[/B] {Альтернативная должность}[/TD2][TD2][B]ПОДРАЗДЕЛЕНИЕ:[/B] {Подразделение}[/TD2][/TR2][TR2][TD2][B]СРОК ДЛЯ ОТВЕТА:[/B] {Срок ответа|date}[/TD2][TD2][B]КАНАЛ ДЛЯ ПОДТВЕРЖДЕНИЯ:[/B] {Канал подтверждения}[/TD2][/TR2][/TABLE2][/BLOCK]`,
+ `[BLOCK=#ffffff]${sec('ТРЕБУЕТСЯ ПОДТВЕРЖДЕНИЕ')}Если вы согласны с предложенной альтернативной должностью, необходимо ответить на это письмо и вернуть его с подтверждением [B]«СОГЛАСЕН»[/B].\nЕсли вы не принимаете альтернативу, верните письмо с отметкой [B]«ОТКАЗЫВАЮСЬ»[/B].\nПри отсутствии ответа до [B]{Срок ответа|date}[/B] обращение будет закрыто без назначения.\n${sign}[/BLOCK]`)}
+];
+
+const $=id=>document.getElementById(id),KEY='lscsd-resp-v1';
+const E=(t,p={},...k)=>{const e=document.createElement(t);Object.assign(e,p);e.append(...k);return e};
+const today=new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const fmt=v=>{if(!v)return'';const[y,m,d]=v.split('-');return `${d}/${MON[m-1]}/${y}`};
+let mem={};try{mem=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(mem))}catch(e){}};
+
+let cur=0,ctl=[],tried=false;
+const form=$('f'),out=$('out'),st=$('st'),sel=$('sel');
+FORMS.forEach((f,i)=>sel.append(E('option',{value:i},f.n)));
+
+function fieldsOf(t){
+  const m=new Map();
+  for(const x of t.matchAll(/\{([^}]+)\}/g)){const[n,ty,df]=x[1].split('|');if(!m.has(n))m.set(n,{n,ty:ty||'text',df:df||''})}
+  return[...m.values()];
+}
+function render(i){
+  cur=(i+FORMS.length)%FORMS.length;mem._i=cur;save();tried=false;
+  sel.value=cur;$('cnt').textContent=`${cur+1} / ${FORMS.length}`;
+  form.textContent='';ctl=[];
+  const grid=E('div',{className:'grid'});
+  form.append(E('fieldset',{},E('legend',{},FORMS[cur].n),grid));
+  for(const f of fieldsOf(FORMS[cur].t)){
+    const el=E(f.ty=='area'?'textarea':'input',f.ty=='date'?{type:'date'}:f.ty=='area'?{}:{type:'text'});
+    el.id='f'+ctl.length;
+    el.value=f.ty=='date'?(f.n=='Дата'?today:''):(mem[f.n]??f.df);
+    const err=E('div',{className:'err'}),lab=E('label',{htmlFor:el.id},f.n);
+    grid.append(E('div',{className:f.ty=='area'?'big':''},lab,el,err));
+    el.addEventListener('input',()=>{if(f.ty!='date'){mem[f.n]=el.value;save()}update()});
+    ctl.push({f,el,err});
+  }
+  update();
+}
+const valOf=c=>c.f.ty=='date'?fmt(c.el.value):c.el.value.trim();
+function build(){
+  const v={};ctl.forEach(c=>v[c.f.n]=valOf(c)||'-');
+  return FORMS[cur].t.replace(/\{([^}]+)\}/g,(m,x)=>v[x.split('|')[0]]);
+}
+function update(){
+  out.value=build();
+  let n=0,first=null;
+  ctl.forEach(c=>{const bad=!valOf(c);c.err.textContent=tried&&bad?'Заполните поле':'';if(bad){n++;first=first||c}});
+  st.textContent=n?`Не заполнено полей: ${n}`:'Всё готово, можно копировать';
+  return{n,first};
+}
+$('prev').onclick=()=>render(cur-1);
+$('next').onclick=()=>render(cur+1);
+sel.onchange=()=>render(+sel.value);
+$('copy').onclick=async()=>{
+  tried=true;const r=update();
+  if(r.n){r.first.el.scrollIntoView({block:'center',behavior:'smooth'});r.first.el.focus({preventScroll:true});return}
+  const text=build();
+  try{await navigator.clipboard.writeText(text)}catch(e){out.value=text;out.select();document.execCommand('copy')}
+  st.textContent='Скопировано. Вставьте в редактор в режиме [ ]';
+};
+$('clear').onclick=()=>{if(confirm('Очистить запомненные поля (кому, подпись и т.д.)?')){mem={_i:cur};save();render(cur)}};
+render(Number.isInteger(mem._i)?mem._i:0);
+</script>
+</body>
+</html>
