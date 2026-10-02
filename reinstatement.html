@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Генератор заявки: восстановление в LSCSD</title>
+<style>
+:root{--bg:#eef0ec;--card:#fff;--ink:#1a202c;--mute:#5d6770;--line:#d5d9d2;--acc:#344434;--acc2:#4b6350}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Segoe UI",Roboto,Arial,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 96px}
+h1{font-size:26px;margin:0 0 6px}
+.lead{margin:0 0 20px;color:var(--mute)}
+fieldset{background:var(--card);border:1px solid var(--line);border-radius:6px;margin:0 0 16px;padding:8px 18px 18px}
+legend{background:var(--acc);color:#fff;font-weight:600;padding:5px 12px;border-radius:4px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px 16px;margin-top:10px}
+.big{grid-column:1/-1}
+label{display:block;font-weight:600;font-size:14px;margin-bottom:4px}
+input,textarea{width:100%;font:inherit;padding:8px 10px;border:1px solid #b9c0b6;border-radius:4px;background:#fbfcfb;color:var(--ink)}
+textarea{min-height:84px;resize:vertical}
+input:focus,textarea:focus,button:focus-visible,summary:focus-visible{outline:3px solid #9fc2a6;outline-offset:1px}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:12px 16px;display:flex;gap:14px;align-items:center;justify-content:center;flex-wrap:wrap}
+button{font:inherit;font-weight:600;background:var(--acc);color:#fff;border:0;border-radius:4px;padding:10px 20px;cursor:pointer}
+button:hover{background:var(--acc2)}
+#st{color:var(--mute);font-size:14px}
+details{margin-top:8px}
+summary{cursor:pointer;color:var(--mute)}
+#out{min-height:220px;font:13px/1.35 Consolas,monospace;margin-top:8px}
+</style>
+</head>
+<body>
+<main>
+<h1>Запрос на восстановление</h1>
+<p class="lead">Заполните поля, нажмите «Скопировать ББ-код». Затем на форуме переключите редактор в режим ББ-кода (кнопка <b>[ ]</b>) и вставьте текст. Пустые поля превратятся в «-».</p>
+<form id="f" onsubmit="return false"></form>
+<details><summary>Показать готовый ББ-код</summary><textarea id="out" readonly></textarea></details>
+</main>
+<div class="bar"><button id="copy" type="button">Скопировать ББ-код</button><span id="st"></span></div>
+
+<script>
+/* Шаблон заявки. Всё, что в {фигурных скобках}, автоматически становится полем формы.
+   Чтобы изменить или добавить поле, правьте только этот шаблон. */
+const T=`[SIZE=3][COLOR=#1a202c][BLOCK=#edf2f7][CENTER][IMG width="100px"]https://i.imgur.com/1IZekQj.png[/IMG]
+[FONT=Arial][SIZE=4][B]LOS SANTOS COUNTY SHERIFF\`S DEPARTMENT[/B][/SIZE]
+[SIZE=2][COLOR=#4a5568]PERSONNEL BUREAU / REINSTATEMENT PROGRAM[/COLOR][/SIZE][/FONT][/CENTER][/BLOCK][BLOCK=#ffffff][CENTER][SIZE=4][B]ЗАПРОС НА ВОССТАНОВЛЕНИЕ[/B][/SIZE][SIZE=2][COLOR=#718096] ФОРМА ПОВТОРНОГО ПОСТУПЛЕНИЯ НА СЛУЖБУ / REV 03/2026[/COLOR][/SIZE][/CENTER][TABLE2][TR2][TD2][B]Тип запроса:[/B] Восстановление[/TD2][TD2][B]Дата подачи:[/B] {дд/мес/гггг}[/TD2][/TR2][/TABLE2][/BLOCK][BLOCK=#ffffff][BLOCK=#344434][COLOR=#ffffff][B]СЕКЦИЯ 1. ПЕРСОНАЛЬНЫЕ ДАННЫЕ[/B][/COLOR][/BLOCK][TABLE2][TR2][TD2][B]Имя:[/B] {имя}[/TD2][TD2][B]Второе имя:[/B] {второе имя}[/TD2][TD2][B]Фамилия:[/B] {фамилия}[/TD2][/TR2][TR2][TD2][B]Телефон:[/B] {номер}[/TD2][TD2][B]Адрес:[/B] {адрес}[/TD2][TD2][B]Полных лет:[/B] {возраст}[/TD2][/TR2][TR2][TD2][B]Основной род деятельности:[/B] {чем занимались}[/TD2][TD2][B]Источник дохода:[/B] {откуда доход}[/TD2][TD2][/TD2][/TR2][/TABLE2][B]Привлекались ли вы к административной или уголовной ответственности за время отсутствия?[/B][BLOCK=#f1f4ff]{ответ}[/BLOCK][B]Как изменились ваши обстоятельства и почему вы готовы вернуться именно сейчас?[/B][BLOCK=#f1f4ff]{ответ}[/BLOCK][B]Есть ли медицинские или психологические противопоказания к службе (включая ПТСР)?[/B][BLOCK=#f1f4ff]{ответ}[/BLOCK][/BLOCK][BLOCK=#f7fafc][BLOCK=#344434][COLOR=#ffffff][B]СЕКЦИЯ 2. СЛУЖЕБНАЯ ИСТОРИЯ[/B][/COLOR][/BLOCK][TABLE2][TR2][TD2][B]Прошлая должность:[/B] {должность}[/TD2][TD2][B]Последнее звание:[/B] {звание}[/TD2][TD2][B]Дата ухода:[/B] {дд/мес/гггг}[/TD2][/TR2][TR2][TD2][B]Станция/дивизион:[/B] {станция}[/TD2][TD2][B]Супервайзер:[/B] { «Да» или «Нет»}[/TD2][TD2][B]Выговоры за 2 года:[/B] {Да/Нет}[/TD2][/TR2][/TABLE2][B]Проводились ли внутренние расследования в последний год службы?[/B][BLOCK=#f1f4ff]{ответ}[/BLOCK][B]Квалификации[/B] [SIZE=2][COLOR=#718096](FTO, BSS и др. и дата последнего подтверждения)[/COLOR][/SIZE][BLOCK=#f1f4ff]{квалификации}[/BLOCK][B]Причина ухода в отставку[/B] [SIZE=2][COLOR=#718096](честно: выгорание, личные обстоятельства, перевод, пенсия)[/COLOR][/SIZE][BLOCK=#f1f4ff]{причина}[/BLOCK][B]Ссылка на приказ об отставке (если есть):[/B] {ссылка}[/BLOCK][BLOCK=#ffffff][BLOCK=#344434][COLOR=#ffffff][B]СЕКЦИЯ 3. ГОСУДАРСТВЕННЫЕ СТРУКТУРЫ[/B][/COLOR][/BLOCK][SIZE=2][COLOR=#718096]Если работали в других гос. структурах за время отсутствия, укажите. Иначе оставьте N/A.[/COLOR][/SIZE][TABLE2][TR2][TD2][B]Организация:[/B] {N/A}[/TD2][TD2][B]Должность:[/B] {N/A}[/TD2][TD2][B]Дата ухода:[/B] {N/A}[/TD2][/TR2][/TABLE2][B]Причина ухода:[/B][BLOCK=#f1f4ff]{N/A}[/BLOCK][/BLOCK][BLOCK=#f7fafc][BLOCK=#344434][COLOR=#ffffff][B](( СЕКЦИЯ 4. ВНЕИГРОВОЙ КОНТЕКСТ ))[/B][/COLOR][/BLOCK][BLOCK=#FFFECD][SIZE=2]Информация ниже является OOC. Скриншот наказаний можно замазать только в области IP адреса.[/SIZE][/BLOCK][B]Форумный аккаунт Gambit:[/B] {ссылка на профиль}
+[B]Краткое описание персонажа и планы на игру:[/B][BLOCK=#f1f4ff]{описание}[/BLOCK][B]Демонстрация игры (ссылки на топики и СС):[/B][BLOCK=#f1f4ff]{ссылки, каждая с новой строки}[/BLOCK][B]Все игровые персонажи за время игры:[/B][BLOCK=#f1f4ff]{список}[/BLOCK][TABLE2][TR2][TD2][B]Знакомые в этой фракции:[/B] {да/нет, кто}[/TD2][TD2][B]Нынешняя фракция (crime/civil/saes):[/B] {фракция или «-»}[/TD2][/TR2][TR2][TD2][B]Double Faction (ссылка):[/B] {ссылка или «-»}[/TD2][TD2][B]ЧС фракций SAES:[/B] {да (укажите) / «-»}[/TD2][/TR2][/TABLE2][B]Почему вы ушли из прошлой фракции:[/B][BLOCK=#f1f4ff]{причина}[/BLOCK][B]Скриншот игровых наказаний:[/B] [SPOILER][IMG]{ссылка на скриншот}[/IMG][/SPOILER]
+[B]Скриншот двухфакторной защиты (telegram/google):[/B] [SPOILER][IMG]{ссылка на скриншот}[/IMG][/SPOILER]
+[B]Прошлые игровые никнеймы:[/B] {ники через запятую}
+[B]Желаемая позиция и должность:[/B] {позиция}[/BLOCK][BLOCK=#344434][CENTER][SIZE=1][COLOR=#ffffff]LOS SANTOS COUNTY SHERIFF\`S DEPARTMENT / 100 WEST 1ST STREET, DILLIMORE, SA[/COLOR][/SIZE][/CENTER][/BLOCK][/COLOR][/SIZE]`;
+
+// Разбор шаблона: ищем {поля}, подпись берём из ближайшего предыдущего [B]...[/B]
+const fields=[];
+for(const m of T.matchAll(/\{([^}]*)\}/g)){
+  const before=T.slice(0,m.index);
+  const bold=[...before.matchAll(/\[B\]([^\[]*?)\[\/B\]/g)].pop();
+  const sec=[...before.matchAll(/СЕКЦИЯ[^\[]*/g)].pop();
+  fields.push({
+    i:fields.length,idx:m.index,len:m[0].length,hint:m[1].trim(),
+    label:bold?bold[1].replace(/:\s*$/,'').trim():'Поле',
+    sec:sec?sec[0].replace(/[\s)]+$/,''):'Общее',
+    big:/\[BLOCK=#f1f4ff\]$/.test(before)
+  });
+}
+
+const vals=[];
+const form=document.getElementById('f'),out=document.getElementById('out'),st=document.getElementById('st');
+let curSec=null,grid=null;
+for(const f of fields){
+  if(f.sec!==curSec){
+    curSec=f.sec;
+    const fs=document.createElement('fieldset');
+    fs.innerHTML='<legend></legend><div class="grid"></div>';
+    fs.querySelector('legend').textContent=curSec;
+    form.appendChild(fs);grid=fs.querySelector('.grid');
+  }
+  const w=document.createElement('div');
+  if(f.big)w.className='big';
+  const id='f'+f.i;
+  const l=document.createElement('label');l.htmlFor=id;l.textContent=f.label;
+  const el=document.createElement(f.big?'textarea':'input');
+  el.id=id;el.placeholder=f.hint;if(!f.big)el.type='text';
+  el.addEventListener('input',()=>{vals[f.i]=el.value.trim();update()});
+  w.append(l,el);grid.appendChild(w);
+}
+
+function build(){
+  let o='',p=0;
+  for(const f of fields){o+=T.slice(p,f.idx)+(vals[f.i]||'-');p=f.idx+f.len}
+  return o+T.slice(p);
+}
+function update(){
+  out.value=build();
+  const empty=fields.filter(f=>!vals[f.i]).length;
+  st.textContent=empty?`Не заполнено полей: ${empty} из ${fields.length}`:'Все поля заполнены';
+}
+document.getElementById('copy').addEventListener('click',async()=>{
+  const text=build();
+  try{await navigator.clipboard.writeText(text)}
+  catch(e){out.value=text;out.select();document.execCommand('copy')}
+  st.textContent='Скопировано. Вставьте в редактор в режиме [ ]';
+});
+update();
+</script>
+</body>
+</html>
