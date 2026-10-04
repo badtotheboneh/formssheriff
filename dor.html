@@ -93,7 +93,7 @@ function bb(S){
       rows+=`[TR2]${td(`${i+1}. ${r[1]||r[0]}`)}${COLS.map((c,k)=>ce(S.r[i]===k?'[B]X[/B]':'[COLOR=#b3b3b3]·[/COLOR]')).join('')}${ce(S.ds[i]?'#'+S.ds[i]:'-')}[/TR2]`;
     });
   });
-  const q=t=>`[QUOTE]${t.trim()||'-'}[/QUOTE]`;
+  const q=t=>`[BLOCK=#f2f2f2]${t.trim()||'-'}[/BLOCK]`;
   return `[SIZE=3][COLOR=#000000]`+
    `[BLOCK=#ffffff][TABLE2][TR2]${td('[B]FIELD TRAINING PROGRAM[/B]\n[SIZE=4][B]DAILY OBSERVATION REPORT[/B][/SIZE]')}${td("[RIGHT][SIZE=2]LOS SANTOS COUNTY SHERIFF'S DEPARTMENT\nPATROL OPERATION[/SIZE][/RIGHT]")}[/TR2][/TABLE2][/BLOCK]`+
    `[BLOCK=#ffffff]${bar('I. GENERAL INFORMATION')}[TABLE2][TR2]${td(`[B]ПОЛНОЕ ИМЯ СТАЖЁРА:[/B] ${S.name.trim()}`)}${td(`[B]ДАТА ПАТРУЛИРОВАНИЯ:[/B] ${fmtDate(S.date)}`)}[/TR2][TR2]${td(`[B]МАРКИРОВКА:[/B] ${S.tag.trim()}`)}${td(`[B]НАЧАЛО И КОНЕЦ ПАТРУЛЯ:[/B] ${S.ts} - ${S.te}`)}[/TR2][/TABLE2][/BLOCK]`+
