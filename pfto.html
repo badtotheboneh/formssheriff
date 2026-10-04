@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Заявление в PFTO / TP</title>
+<style>
+:root{--bg:#eef0ec;--card:#fff;--ink:#1a202c;--mute:#5d6770;--line:#d5d9d2;--acc:#344434;--acc2:#4b6350}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Segoe UI",Roboto,Arial,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 110px}
+h1{font-size:26px;margin:0 0 6px}
+.lead{margin:0 0 18px;color:var(--mute)}
+.nav{display:inline-block;margin:0 14px 10px 0;color:var(--acc);font-weight:600}
+.info{background:#fff;border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:4px;padding:10px 16px;margin-bottom:16px;font-size:14px}
+.info ul{margin:6px 0 0;padding-left:20px}
+fieldset{background:var(--card);border:1px solid var(--line);border-radius:6px;margin:0 0 16px;padding:8px 18px 18px}
+legend{background:#000;color:#fff;font-weight:600;padding:5px 12px;border-radius:4px}
+.q{margin-top:14px}
+.qh{display:flex;align-items:center;gap:8px;background:#dddee0;padding:4px 10px;margin-bottom:6px}
+.qh label{flex:1;font-weight:700;font-size:14px;margin:0}
+input[type=text],textarea,select{width:100%;font:inherit;padding:8px 10px;border:1px solid #b9c0b6;border-radius:4px;background:#fbfcfb;color:var(--ink)}
+textarea{min-height:120px;resize:vertical}
+.yn{display:grid;grid-template-columns:140px 1fr;gap:8px}
+@media(max-width:560px){.yn{grid-template-columns:1fr}}
+:focus-visible{outline:3px solid #9fc2a6;outline-offset:1px}
+.meta{display:flex;justify-content:space-between;gap:10px;font-size:13px;margin-top:3px}
+.cnt{color:var(--mute)}.warn{color:#9a6700}.err{color:#b3261e}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:12px 16px;display:flex;gap:10px 12px;align-items:center;justify-content:center;flex-wrap:wrap}
+button{font:inherit;font-weight:600;background:var(--acc);color:#fff;border:0;border-radius:4px;padding:10px 18px;cursor:pointer}
+button:hover{background:var(--acc2)}
+.ghost{background:none;color:var(--acc);border:1px solid var(--acc);padding:3px 10px;font-size:12px}
+.bar .ghost{padding:8px 14px;font-size:inherit}
+.ghost:hover{background:#e3e9e3}
+#st{color:var(--mute);font-size:14px}
+details{margin-top:8px}summary{cursor:pointer;color:var(--mute)}
+#out{min-height:240px;font:13px/1.35 Consolas,monospace;margin-top:8px}
+</style>
+</head>
+<body>
+<main>
+<a class="nav" href="index.html">← Заявка на восстановление</a><a class="nav" href="responses.html">Формы ответов</a><a class="nav" href="dor.html">DOR</a><a class="nav" href="checklist.html">Чек-лист</a>
+<h1>Заявление в PFTO / Training Program</h1>
+<p class="lead">Заполните форму, скопируйте заголовок темы и ББ-код (вставляйте в редакторе в режиме <b>[ ]</b>). Черновик сохраняется в браузере.</p>
+<div class="info"><b>Инструкция</b><ul><li>Если какая-либо информация вам неизвестна или у вас нет ответа на вопрос, укажите <b>N/A</b> (рядом с каждым полем есть кнопка).</li><li>Заполняйте заявление максимально подробно: заявку могут отклонить из-за небрежного или неполного заполнения.</li><li>Если возникли вопросы или вы обнаружили ошибку, обратитесь в In-service Training Program.</li></ul></div>
+<form id="f" onsubmit="return false"></form>
+<details><summary>Показать готовый ББ-код</summary><textarea id="out" readonly></textarea></details>
+</main>
+<div class="bar"><button id="ct" type="button" class="ghost">Скопировать заголовок</button><button id="cb" type="button">Скопировать ББ-код</button><button id="clr" type="button" class="ghost">Новая заявка</button><span id="st"></span></div>
+
+<script>
+const IMG='https://i.imgur.com/cR2TEia.png',SH="Los Santos County Sheriff`s Department";
+// [вопрос, тип (name|text|area|yn), подсказка]
+const SEC=[
+['ЧАСТЬ А. ОСНОВНАЯ ИНФОРМАЦИЯ',[
+ ['ФАМИЛИЯ ИМЯ','name','Например: Javier Sanchez'],
+ ['ЗВАНИЕ И ДОЛЖНОСТЬ','text','Например: Deputy Sheriff, Patrol Deputy'],
+ ['ВАШЕ ПОДРАЗДЕЛЕНИЕ','text',"Например: Lancaster Sheriff's Station"],
+ ['СТАЖ СЛУЖБЫ','text','Например: 5 лет']]],
+['ЧАСТЬ B. ОСНОВНЫЕ ВОПРОСЫ',[
+ ['ПОЧЕМУ ВЫ РЕШИЛИ ВСТУПИТЬ В ПРОГРАММУ?','area','Опишите мотивацию подробно'],
+ ['КРАТКО ОПИШИТЕ СЕБЯ, КАК КАНДИДАТА.','area','Опыт, сильные стороны, чем можете быть полезны'],
+ ['КАКИМ ДОЛЖЕН БЫТЬ ИДЕАЛЬНЫЙ НАСТАВНИК, ПО ВАШЕМУ МНЕНИЮ?','area','Ваше видение наставничества']]],
+['(( ЧАСТЬ С. ООС ИНФОРМАЦИЯ ))',[
+ ['ОПИШИТЕ СВОЕГО ПЕРСОНАЖА НЕСКОЛЬКИМИ ПРЕДЛОЖЕНИЯМИ.','area','Характер, взгляды, черты персонажа'],
+ ['ГОТОВЫ ЛИ ВЫ ВЕСТИ ЕЖЕДНЕВНУЮ ОТЧЁТНОСТЬ И ДЕМОНСТРИРОВАТЬ ИГРУ?','yn','Комментарий (необязательно)']]]];
+const QS=SEC.flatMap(s=>s[1]);
+const cap=s=>s.trim().replace(/\s+/g,' ').replace(/(^|[\s-])(\S)/g,(a,b,c)=>b+c.toUpperCase());
+const ans=(S,i)=>{const k=QS[i][1],v=(S.a[i]||'').trim();
+  return k=='name'?cap(v):k=='yn'?(v?v+'.'+(S.c[i]&&S.c[i].trim()?' '+S.c[i].trim():''):''):v};
+const title=S=>`[PFTO/PTP] ${cap(S.a[0]||'')}`;
+// S = {a:[ответы], c:[комментарии]}
+function bb(S){
+  const bar=t=>`[BLOCK=#000000][COLOR=#ffffff][B]${t}[/B][/COLOR][/BLOCK]`;
+  let i=0;
+  return `[SIZE=3][COLOR=#000000][BLOCK=#ffffff][IMG]${IMG}[/IMG]\n${SH} – In-service Training Program\n[SIZE=4][B]POST- FIELD TRAINING PROGRAM (PFTO)\nOR TRAINING PROGRAM (TP)\nAPPLICATION[/B][/SIZE]\n[SIZE=2](Administrative Order #4 (Rev. 06/2025))[/SIZE][/BLOCK]`+
+   `[BLOCK=#f2f2f2][B]ИНСТРУКЦИЯ[/B][LIST][*]Если какая-либо информация Вам неизвестна или у Вас нет ответа на вопрос, укажите в соответствующем поле — [B]N/A[/B].\n[*]Старайтесь заполнять заявление максимально подробно. Помните, что Вашу заявку могут отклонить из-за небрежного или неполного заполнения.\n[*]Если у Вас возникли вопросы, Вы что-то не понимаете или обнаружили ошибку, обратитесь в In-service Training Program.[/LIST][/BLOCK]`+
+   SEC.map(s=>`[BLOCK=#ffffff]${bar(s[0])}`+s[1].map((q,n)=>{const k=i++;return `[BLOCK=#dddee0][B]${n+1}. ${q[0]}[/B][/BLOCK]${ans(S,k)||'-'}`}).join('')+'[/BLOCK]').join('')+
+   '[/COLOR][/SIZE]';
+}
+/*DOM*/
+const $=id=>document.getElementById(id),KEY='lscsd-pfto-v1';
+const E=(t,p={},...k)=>{const e=document.createElement(t);Object.assign(e,p);e.append(...k);return e};
+const blank=()=>({a:QS.map(()=>''),c:QS.map(()=>'')});
+let S=blank(),tried=false;
+try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.a&&d.a.length==QS.length)S={...blank(),...d}}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const form=$('f'),out=$('out'),st=$('st'),ctl=[];
+let i=0;
+SEC.forEach(s=>{
+  const fs=E('fieldset',{},E('legend',{},s[0]));
+  s[1].forEach((q,n)=>{
+    const k=i++,id='q'+k,kind=q[1];
+    let el,extra=null;
+    if(kind=='area')el=E('textarea',{placeholder:q[2]});
+    else if(kind=='yn'){
+      el=E('select',{},E('option',{value:''},'Выберите…'),E('option',{value:'Да'},'Да'),E('option',{value:'Нет'},'Нет'));
+      extra=E('input',{type:'text',placeholder:q[2]});extra.value=S.c[k]||'';
+      extra.oninput=()=>{S.c[k]=extra.value;save();update()};
+    }else el=E('input',{type:'text',placeholder:q[2]});
+    el.id=id;el.value=S.a[k]||'';
+    el.addEventListener('input',()=>{S.a[k]=el.value;save();update()});
+    el.addEventListener('change',()=>{S.a[k]=el.value;save();update()});
+    const na=E('button',{type:'button',className:'ghost',title:'Нет информации: подставить N/A'},'N/A');
+    na.onclick=()=>{el.value='N/A';S.a[k]='N/A';save();update()};
+    const head=E('div',{className:'qh'},E('label',{htmlFor:id},`${n+1}. ${q[0]}`));
+    if(kind!='yn')head.append(na);
+    const meta=E('div',{className:'meta'},E('span',{className:'err'}),E('span',{className:'cnt'}));
+    fs.append(E('div',{className:'q'},head,kind=='yn'?E('div',{className:'yn'},el,extra):el,meta));
+    ctl.push({k,kind,el,err:meta.children[0],cnt:meta.children[1]});
+  });
+  form.append(fs);
+});
+
+function update(){
+  out.value=bb(S);
+  let n=0,first=null;
+  ctl.forEach(c=>{
+    const v=(S.a[c.k]||'').trim(),bad=!v;
+    c.err.textContent=tried&&bad?'Заполните поле или укажите N/A':'';
+    if(c.kind=='area'){
+      c.cnt.textContent=v?`${v.length} симв.`:'';
+      c.cnt.className=v&&v.length<120&&v!='N/A'?'cnt warn':'cnt';
+      if(v&&v.length<120&&v!='N/A')c.cnt.textContent+=' — слишком кратко, заявку могут отклонить';
+    }
+    if(bad){n++;first=first||c}
+  });
+  st.textContent=n?`Не заполнено полей: ${n}`:'Всё заполнено, можно копировать';
+  return first;
+}
+async function copy(text,msg){
+  try{await navigator.clipboard.writeText(text)}catch(e){out.value=text;out.select();document.execCommand('copy')}
+  st.textContent=msg;
+}
+function guard(onlyName){
+  tried=true;const f=update(),c=onlyName?(ctl[0].el.value.trim()?null:ctl[0]):f;
+  if(c){c.el.scrollIntoView({block:'center',behavior:'smooth'});c.el.focus({preventScroll:true});return false}
+  return true;
+}
+$('ct').onclick=()=>guard(true)&&copy(title(S),'Заголовок скопирован. Вставьте его в поле «Заголовок темы»');
+$('cb').onclick=()=>guard(false)&&copy(bb(S),'ББ-код скопирован. Вставьте в редактор в режиме [ ]');
+$('clr').onclick=()=>{if(confirm('Очистить все поля и начать новую заявку?')){S=blank();save();location.reload()}};
+update();
+</script>
+</body>
+</html>
