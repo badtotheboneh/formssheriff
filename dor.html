@@ -96,7 +96,7 @@ function bb(S){
   const q=t=>`[BLOCK=#f2f2f2]${t.trim()||'-'}[/BLOCK]`;
   return `[SIZE=3][COLOR=#000000]`+
    `[BLOCK=#ffffff][TABLE2][TR2]${td('[B]FIELD TRAINING PROGRAM[/B]\n[SIZE=4][B]DAILY OBSERVATION REPORT[/B][/SIZE]')}${td("[RIGHT][SIZE=2]LOS SANTOS COUNTY SHERIFF'S DEPARTMENT\nPATROL OPERATION[/SIZE][/RIGHT]")}[/TR2][/TABLE2][/BLOCK]`+
-   `[BLOCK=#ffffff]${bar('I. GENERAL INFORMATION')}[TABLE2][TR2]${td(`[B]ПОЛНОЕ ИМЯ СТАЖЁРА:[/B] ${S.name.trim()}`)}${td(`[B]ДАТА ПАТРУЛИРОВАНИЯ:[/B] ${fmtDate(S.date)}`)}[/TR2][TR2]${td(`[B]МАРКИРОВКА:[/B] ${S.tag.trim()}`)}${td(`[B]НАЧАЛО И КОНЕЦ ПАТРУЛЯ:[/B] ${S.ts} - ${S.te}`)}[/TR2][/TABLE2][/BLOCK]`+
+   `[BLOCK=#ffffff]${bar('I. GENERAL INFORMATION')}[TABLE2][TR2]${td(`[B]ПОЛНОЕ ИМЯ ИСПЫТУЕМОГО:[/B] ${S.name.trim()}`)}${td(`[B]ДАТА ПАТРУЛИРОВАНИЯ:[/B] ${fmtDate(S.date)}`)}[/TR2][TR2]${td(`[B]МАРКИРОВКА:[/B] ${S.tag.trim()}`)}${td(`[B]НАЧАЛО И КОНЕЦ ПАТРУЛЯ:[/B] ${S.ts} - ${S.te}`)}[/TR2][/TABLE2][/BLOCK]`+
    `[BLOCK=#ffffff]${bar('II. RATING BY CATEGORY')}[BLOCK=#f2f2f2][SIZE=2]${LEG.join('\n')}[/SIZE][/BLOCK][TABLE2]${rows}[/TABLE2][/BLOCK]`+
    `[BLOCK=#ffffff]${bar('III. DOCUMENTED SITUATIONS (DS)')}[B]ЗАДОКУМЕНТИРОВАННЫЕ СИТУАЦИИ[/B]${q(S.dsText)}[/BLOCK]`+
    `[BLOCK=#ffffff]${bar('IV. (( OOC. УРОВЕНЬ ИГРЫ ))')}[B]ВАШИ ЛИЧНЫЕ РЕКОМЕНДАЦИИ/КОММЕНТАРИИ И ЗАМЕЧАНИЯ[/B]${q(S.ooc)}[/BLOCK]`+
@@ -116,9 +116,9 @@ const field=(key,label,el,cls='')=>{const err=E('div',{className:'err'});errs[ke
   el.addEventListener('input',()=>{S[key]=el.value;save();update()});
   return E('div',{className:cls},E('label',{className:'t',htmlFor:el.id},label),el,err)};
 const dl=E('datalist',{id:'names'});
-const nameEl=E('input',{type:'text',placeholder:'например, Ed Galvard'});nameEl.setAttribute('list','names');
+const nameEl=E('input',{type:'text',placeholder:'например, Name Surname'});nameEl.setAttribute('list','names');
 const g1=E('div',{className:'grid'},
-  field('name','Полное имя стажёра',nameEl),
+  field('name','Полное имя испытуемого',nameEl),
   field('date','Дата патрулирования',E('input',{type:'date'})),
   field('tag','Маркировка патруля',E('input',{type:'text',placeholder:'например, 281'})),
   E('div',{},E('label',{className:'t'},'Начало и конец патруля'),E('div',{className:'time'},
@@ -146,7 +146,7 @@ dl.append(...hist.map(h=>E('option',{value:h})));
 
 function problems(){
   const p={};
-  if(!S.name.trim())p.name='Укажите стажёра';
+  if(!S.name.trim())p.name='Укажите испытуемого';
   if(!S.date)p.date='Укажите дату';
   if(!S.tag.trim())p.tag='Укажите маркировку';
   if(!S.ts||!S.te)p.ts='Укажите время начала и конца';
