@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Генератор DOR: Daily Observation Report</title>
+<style>
+:root{--bg:#eef0ec;--card:#fff;--ink:#1a202c;--mute:#5d6770;--line:#d5d9d2;--acc:#344434;--acc2:#4b6350}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Segoe UI",Roboto,Arial,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 110px}
+h1{font-size:26px;margin:0 0 6px}
+.lead{margin:0 0 18px;color:var(--mute)}
+.nav{display:inline-block;margin:0 14px 10px 0;color:var(--acc);font-weight:600}
+fieldset{background:var(--card);border:1px solid var(--line);border-radius:6px;margin:0 0 16px;padding:8px 18px 18px}
+legend{background:#000;color:#fff;font-weight:600;padding:5px 12px;border-radius:4px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px 16px;margin-top:10px}
+.big{grid-column:1/-1}
+label.t{display:block;font-weight:600;font-size:14px;margin-bottom:4px}
+input[type=text],input[type=date],input[type=time],textarea,select{width:100%;font:inherit;padding:8px 10px;border:1px solid #b9c0b6;border-radius:4px;background:#fbfcfb;color:var(--ink)}
+textarea{min-height:110px;resize:vertical}
+:focus-visible{outline:3px solid #9fc2a6;outline-offset:1px}
+.time{display:flex;gap:8px;align-items:center}
+.legend{background:#f2f2f2;border:1px solid #dcdcdc;padding:10px 14px;font-size:13px;color:#333;margin:10px 0}
+.grp{background:#dddee0;font-weight:700;padding:5px 10px;margin:14px 0 0;border-top:2px solid #000;font-size:14px}
+.row{display:grid;grid-template-columns:1fr auto 84px;gap:8px 12px;align-items:center;padding:8px 4px;border-bottom:1px solid var(--line)}
+.row:hover{background:#f5f7fa}
+.pills{display:flex;gap:4px}
+.pill input{position:absolute;opacity:0}
+.pill span{display:block;min-width:46px;text-align:center;padding:5px 6px;border:1px solid #b9c0b6;border-radius:4px;font-size:13px;cursor:pointer;background:#fff}
+.pill input:checked+span{background:var(--acc);color:#fff;border-color:var(--acc);font-weight:700}
+.pill input:focus-visible+span{outline:3px solid #9fc2a6}
+.row select{padding:5px}
+@media(max-width:640px){.row{grid-template-columns:1fr 84px}.pills{grid-column:1/-1;order:3}}
+.err{color:#b3261e;font-size:13px;margin-top:3px}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:12px 16px;display:flex;gap:10px 12px;align-items:center;justify-content:center;flex-wrap:wrap}
+button{font:inherit;font-weight:600;background:var(--acc);color:#fff;border:0;border-radius:4px;padding:10px 18px;cursor:pointer}
+button:hover{background:var(--acc2)}
+.ghost{background:none;color:var(--acc);border:1px solid var(--acc);padding:8px 14px}
+.ghost:hover{background:#e3e9e3}
+#st{color:var(--mute);font-size:14px;width:100%;text-align:center}
+@media(min-width:900px){#st{width:auto}}
+details{margin-top:8px}summary{cursor:pointer;color:var(--mute)}
+#out{min-height:240px;font:13px/1.35 Consolas,monospace;margin-top:8px}
+</style>
+</head>
+<body>
+<main>
+<a class="nav" href="index.html">← Заявка на восстановление</a><a class="nav" href="responses.html">Формы ответов</a>
+<h1>Daily Observation Report</h1>
+<p class="lead">Заполните данные и оценки, затем скопируйте заголовок темы и ББ-код (вставляйте в редакторе в режиме <b>[ ]</b>). Черновик сохраняется в браузере.</p>
+<form id="f" onsubmit="return false"></form>
+<details><summary>Показать готовый ББ-код</summary><textarea id="out" readonly></textarea></details>
+</main>
+<div class="bar"><button id="ct" type="button" class="ghost">Скопировать заголовок</button><button id="cb" type="button">Скопировать ББ-код</button><button id="all" type="button" class="ghost">Все «C»</button><button id="clr" type="button" class="ghost">Новый отчёт</button><span id="st"></span></div>
+
+<script>
+const MON=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const COLS=['N/O','N/I','C','S','NRT'];
+const LEG=['[B](N/O)[/B] Не оценено или поведения не наблюдалось.','[B](N/I) НИЖЕ СТАНДАРТА[/B]: Такое поведение демонстрирует неспособность выполнить требуемые задачи.','[B](C) СТАНДАРТ[/B]: Демонстрирует адекватную способность выполнять требуемые задачи.','[B](S) СВЕРХ СТАНДАРТ[/B]: Такое поведение демонстрирует более чем адекватную способность выполнять требуемые задачи.','[B](NRT)[/B] Помощник, находящийся на испытательном сроке, не реагирует на обучение.'];
+// [полное название, короткое для ББ-кода (если нужно)]
+const G=[['ЛИЧНЫЕ КАЧЕСТВА',[
+ ['Принятие критики/ответственность'],
+ ['Результаты полевых испытаний эффективности (Нормальные условия)','Результаты полевых испытаний эффективности (Норм. усл.)'],
+ ['Результаты полевых испытаний эффективности (Напряжённые условия)','Результаты полевых испытаний эффективности (Напр. усл.)'],
+ ['Поведение испытуемого в условиях близким к экстренным'],
+ ['Безопасность офицера (Нормальные условия и стрессовые условия)','Безопасность офицера (Норм. и стресс. условия)'],
+ ['Инициативность в выборе ситуаций и планирования действий'],
+ ['Здравый смысл во время ситуации']]],
+['ВЗАИМООТНОШЕНИЯ',[
+ ['Умение влиять на окружающих (Нормальные условия)'],
+ ['Умение выстраивать отношения с окружающими'],
+ ['Контроль конфликта, голосовые команды']]],
+['НАВЫКИ',[
+ ['Практическое применение правовой базы, обыска/изъятия'],
+ ['Навыки вождения (Нормальные и стрессовые условия)']]],
+['ЗНАНИЯ',[
+ ['Политики/процедуры Департамента (Нормативно-правовые документы)','Политики/процедуры Департамента (Нормативные док-ты)'],
+ ['Радио/MDC, надлежащее использование кодов связи, слушает и понимает передачи','Радио/MDC, надлежащее использование кодов связи']]]];
+const ROWS=G.flatMap(g=>g[1]);
+const fmtDate=v=>{if(!v)return'';const[y,m,d]=v.split('-');return `${d}/${MON[m-1]}/${y}`};
+const title=S=>`[DOR] ${S.name.trim()} — ${fmtDate(S.date)}`;
+
+// S = {name,date,tag,ts,te,r:[-1..4],ds:[],dsText,ooc}
+function bb(S){
+  const bar=t=>`[BLOCK=#000000][COLOR=#ffffff][B]${t}[/B][/COLOR][/BLOCK]`;
+  const td=c=>`[TD2]${c}[/TD2]`,ce=c=>td(`[CENTER]${c}[/CENTER]`);
+  let n=0,rows=`[TR2]${td('[B]КАТЕГОРИИ[/B]')}${[...COLS,'DS'].map(x=>ce(`[B]${x}[/B]`)).join('')}[/TR2]`;
+  G.forEach(g=>{
+    rows+=`[TR2]${td(`[B]${g[0]}[/B]`)}${td(' ').repeat(6)}[/TR2]`;
+    g[1].forEach(r=>{
+      const i=n++;
+      rows+=`[TR2]${td(`${i+1}. ${r[1]||r[0]}`)}${COLS.map((c,k)=>ce(S.r[i]===k?'[B]X[/B]':'[COLOR=#b3b3b3]·[/COLOR]')).join('')}${ce(S.ds[i]?'#'+S.ds[i]:'-')}[/TR2]`;
+    });
+  });
+  const q=t=>`[QUOTE]${t.trim()||'-'}[/QUOTE]`;
+  return `[SIZE=3][COLOR=#000000]`+
+   `[BLOCK=#ffffff][TABLE2][TR2]${td('[B]FIELD TRAINING PROGRAM[/B]\n[SIZE=4][B]DAILY OBSERVATION REPORT[/B][/SIZE]')}${td("[RIGHT][SIZE=2]LOS SANTOS COUNTY SHERIFF'S DEPARTMENT\nPATROL OPERATION[/SIZE][/RIGHT]")}[/TR2][/TABLE2][/BLOCK]`+
+   `[BLOCK=#ffffff]${bar('I. GENERAL INFORMATION')}[TABLE2][TR2]${td(`[B]ПОЛНОЕ ИМЯ СТАЖЁРА:[/B] ${S.name.trim()}`)}${td(`[B]ДАТА ПАТРУЛИРОВАНИЯ:[/B] ${fmtDate(S.date)}`)}[/TR2][TR2]${td(`[B]МАРКИРОВКА:[/B] ${S.tag.trim()}`)}${td(`[B]НАЧАЛО И КОНЕЦ ПАТРУЛЯ:[/B] ${S.ts} - ${S.te}`)}[/TR2][/TABLE2][/BLOCK]`+
+   `[BLOCK=#ffffff]${bar('II. RATING BY CATEGORY')}[BLOCK=#f2f2f2][SIZE=2]${LEG.join('\n')}[/SIZE][/BLOCK][TABLE2]${rows}[/TABLE2][/BLOCK]`+
+   `[BLOCK=#ffffff]${bar('III. DOCUMENTED SITUATIONS (DS)')}[B]ЗАДОКУМЕНТИРОВАННЫЕ СИТУАЦИИ[/B]${q(S.dsText)}[/BLOCK]`+
+   `[BLOCK=#ffffff]${bar('IV. (( OOC. УРОВЕНЬ ИГРЫ ))')}[B]ВАШИ ЛИЧНЫЕ РЕКОМЕНДАЦИИ/КОММЕНТАРИИ И ЗАМЕЧАНИЯ[/B]${q(S.ooc)}[/BLOCK]`+
+   `[/COLOR][/SIZE]`;
+}
+/*DOM*/
+const $=id=>document.getElementById(id),KEY='lscsd-dor-v1',HKEY='lscsd-dor-names';
+const E=(t,p={},...k)=>{const e=document.createElement(t);Object.assign(e,p);e.append(...k);return e};
+const today=new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const blank=()=>({name:'',date:today,tag:'',ts:'',te:'',r:ROWS.map(()=>-1),ds:ROWS.map(()=>''),dsText:'',ooc:''});
+let S=blank(),tried=false,hist=[];
+try{S={...blank(),...JSON.parse(localStorage.getItem(KEY))};hist=JSON.parse(localStorage.getItem(HKEY))||[]}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+
+const form=$('f'),out=$('out'),st=$('st'),errs={};
+const field=(key,label,el,cls='')=>{const err=E('div',{className:'err'});errs[key]=err;el.id='i_'+key;el.value=S[key];
+  el.addEventListener('input',()=>{S[key]=el.value;save();update()});
+  return E('div',{className:cls},E('label',{className:'t',htmlFor:el.id},label),el,err)};
+const dl=E('datalist',{id:'names'});
+const nameEl=E('input',{type:'text',placeholder:'например, Ed Galvard'});nameEl.setAttribute('list','names');
+const g1=E('div',{className:'grid'},
+  field('name','Полное имя стажёра',nameEl),
+  field('date','Дата патрулирования',E('input',{type:'date'})),
+  field('tag','Маркировка патруля',E('input',{type:'text',placeholder:'например, 281'})),
+  E('div',{},E('label',{className:'t'},'Начало и конец патруля'),E('div',{className:'time'},
+    field('ts','',E('input',{type:'time'})),E('span',{},'до'),field('te','',E('input',{type:'time'})))));
+form.append(E('fieldset',{},E('legend',{},'I. General information'),g1,dl));
+
+const rf=E('fieldset',{},E('legend',{},'II. Rating by category'),E('div',{className:'legend',innerHTML:LEG.join('<br>').replace(/\[B\]/g,'<b>').replace(/\[\/B\]/g,'</b>')}));
+let n=0;
+G.forEach(g=>{
+  rf.append(E('div',{className:'grp'},g[0]));
+  g[1].forEach(r=>{
+    const i=n++,pills=E('div',{className:'pills'},...COLS.map((c,k)=>{
+      const rb=E('input',{type:'radio',name:'r'+i,checked:S.r[i]===k});
+      rb.addEventListener('change',()=>{S.r[i]=k;save();update()});
+      return E('label',{className:'pill'},rb,E('span',{},c))}));
+    const ds=E('select',{title:'Задокументированная ситуация'},...['','DS1','DS2','DS3'].map(x=>E('option',{value:x},x?'#'+x:'DS: -')));
+    ds.value=S.ds[i];ds.addEventListener('change',()=>{S.ds[i]=ds.value;save();update()});
+    rf.append(E('div',{className:'row'},E('div',{},`${i+1}. ${r[0]}`),pills,ds));
+  });
+});
+form.append(rf);
+form.append(E('fieldset',{},E('legend',{},'III. Documented situations (DS)'),field('dsText','Задокументированные ситуации',E('textarea',{placeholder:'Описание конкретных игровых инцидентов/ситуаций...'}),'big')));
+form.append(E('fieldset',{},E('legend',{},'IV. (( OOC. Уровень игры ))'),field('ooc','Ваши личные рекомендации/комментарии и замечания',E('textarea',{placeholder:'Дополнительные мысли куратора...'}),'big')));
+dl.append(...hist.map(h=>E('option',{value:h})));
+
+function problems(){
+  const p={};
+  if(!S.name.trim())p.name='Укажите стажёра';
+  if(!S.date)p.date='Укажите дату';
+  if(!S.tag.trim())p.tag='Укажите маркировку';
+  if(!S.ts||!S.te)p.ts='Укажите время начала и конца';
+  return p;
+}
+function update(){
+  const p=problems(),un=S.r.filter(x=>x<0).length;
+  Object.keys(errs).forEach(k=>errs[k].textContent=tried?(p[k]||''):'');
+  out.value=bb(S);
+  st.textContent=Object.keys(p).length?`Не заполнено обязательных полей: ${Object.keys(p).length}`:(un?`Без оценки строк: ${un} из ${ROWS.length}`:'Всё заполнено, можно копировать');
+  return p;
+}
+async function copy(text,msg){
+  try{await navigator.clipboard.writeText(text)}catch(e){out.value=text;out.select();document.execCommand('copy')}
+  st.textContent=msg;
+}
+function guard(){tried=true;const p=update(),k=Object.keys(p)[0];if(k){$('i_'+k).scrollIntoView({block:'center',behavior:'smooth'});$('i_'+k).focus({preventScroll:true});return false}return true}
+$('ct').onclick=()=>guard()&&copy(title(S),'Заголовок скопирован. Вставьте его в поле «Заголовок темы»');
+$('cb').onclick=()=>{
+  if(!guard())return;
+  const nm=S.name.trim();hist=[nm,...hist.filter(x=>x!==nm)].slice(0,30);
+  try{localStorage.setItem(HKEY,JSON.stringify(hist))}catch(e){}
+  copy(bb(S),'ББ-код скопирован. Вставьте в редактор в режиме [ ]');
+};
+$('all').onclick=()=>{S.r=S.r.map(()=>2);save();document.querySelectorAll('.pills').forEach(p=>p.children[2].firstChild.checked=true);update()};
+$('clr').onclick=()=>{if(confirm('Очистить все поля и начать новый отчёт?')){S=blank();tried=false;save();location.reload()}};
+update();
+</script>
+</body>
+</html>
