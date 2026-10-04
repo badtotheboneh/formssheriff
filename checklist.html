@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Чек-лист испытуемого помощника: программа полевой подготовки</title>
+<style>
+:root{--bg:#eef0ec;--card:#fff;--ink:#1a202c;--mute:#5d6770;--line:#d5d9d2;--acc:#344434;--acc2:#4b6350}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Segoe UI",Roboto,Arial,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 110px}
+h1{font-size:26px;margin:0 0 6px}
+.lead{margin:0 0 18px;color:var(--mute)}
+.nav{display:inline-block;margin:0 14px 10px 0;color:var(--acc);font-weight:600}
+fieldset{background:var(--card);border:1px solid var(--line);border-radius:6px;margin:0 0 16px;padding:8px 18px 16px}
+legend{background:#000;color:#fff;font-weight:600;padding:5px 12px;border-radius:4px}
+input[type=text],input[type=url],input[type=date],textarea{width:100%;font:inherit;padding:8px 10px;border:1px solid #b9c0b6;border-radius:4px;background:#fbfcfb;color:var(--ink)}
+textarea{min-height:110px;resize:vertical}
+:focus-visible{outline:3px solid #9fc2a6;outline-offset:1px}
+label.t{display:block;font-weight:600;font-size:14px;margin-bottom:4px}
+.sbar{display:flex;gap:8px;align-items:center;margin:8px 0 4px}
+.prog{flex:1;color:var(--mute);font-size:14px;font-weight:600}
+.gh{display:flex;align-items:center;gap:10px;background:#dddee0;border-top:2px solid #000;padding:4px 10px;margin-top:12px}
+.gh b{flex:1;font-size:14px}
+.it{display:flex;gap:10px;align-items:flex-start;padding:5px 6px;border-bottom:1px solid var(--line);cursor:pointer}
+.it:hover{background:#f5f7fa}
+.it input{margin-top:5px;width:18px;height:18px;flex:none}
+.star{color:#c53030;font-weight:700}.ooc,.gray{color:var(--mute);font-size:13px}
+.lk{display:grid;grid-template-columns:170px 1fr;gap:8px;padding:0 6px 8px 34px;border-bottom:1px solid var(--line)}
+.err{color:#b3261e;font-size:13px;grid-column:1/-1}
+@media(max-width:560px){.lk{grid-template-columns:1fr}}
+.note{background:#fff5f5;border-left:4px solid #c53030;padding:8px 12px;margin-top:12px;font-size:13px;color:#7b1d1d;white-space:pre-line}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:12px 16px;display:flex;gap:10px 12px;align-items:center;justify-content:center;flex-wrap:wrap}
+button{font:inherit;font-weight:600;background:var(--acc);color:#fff;border:0;border-radius:4px;padding:10px 18px;cursor:pointer}
+button:hover{background:var(--acc2)}
+.ghost{background:none;color:var(--acc);border:1px solid var(--acc);padding:5px 12px;font-size:13px}
+.bar .ghost{padding:8px 14px;font-size:inherit}
+.ghost:hover{background:#e3e9e3}
+#st{color:var(--mute);font-size:14px}
+details{margin-top:8px}summary{cursor:pointer;color:var(--mute)}
+#out,#imp{min-height:200px;font:13px/1.35 Consolas,monospace;margin-top:8px}
+#imp{min-height:90px;margin:0 0 8px}
+</style>
+</head>
+<body>
+<main>
+<a class="nav" href="index.html">← Заявка</a><a class="nav" href="responses.html">Формы ответов</a><a class="nav" href="dor.html">DOR</a>
+<h1>Чек-лист испытуемого помощника</h1>
+<p class="lead">Отмечайте пройденные пункты, для этапа 3 добавляйте дату и ссылку. Затем скопируйте ББ-код. Чтобы продолжить уже опубликованный чек-лист, загрузите его ББ-код в первом блоке.</p>
+<fieldset><legend>Продолжить заполнение (необязательно)</legend><label class="t" for="imp">ББ-код чек-листа из предыдущей версии темы</label><textarea id="imp" placeholder="Вставьте сюда ББ-код из вашей темы (режим [ ] в редакторе). Отметки, даты и ссылки подгрузятся автоматически."></textarea><div class="sbar"><button id="load" type="button">Загрузить из ББ-кода</button><span id="impst" class="prog"></span></div></fieldset>
+<div id="head"></div>
+<form id="f" onsubmit="return false"></form>
+<details><summary>Показать готовый ББ-код</summary><textarea id="out" readonly></textarea></details>
+</main>
+<div class="bar"><button id="cb" type="button">Скопировать ББ-код</button><button id="clr" type="button" class="ghost">Сбросить всё</button><span id="st"></span></div>
+
+<script>
+const MON=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const TITLE='ПРОГРАММА ПОЛЕВОЙ ПОДГОТОВКИ — ЧЕК-ЛИСТ ИСПЫТУЕМОГО ПОМОЩНИКА';
+const INTRO='Весь материал в данном чек-листе должен быть утвержден офицером полевой подготовки (FTO). Для подтверждения выполнения пункта испытуемый помощник обязан продемонстрировать надлежащий уровень понимания и/или компетентности для оцениваемого этапа. Испытуемые помощники несут ответственность за своевременное обращение за разъяснениями и дополнительными инструкциями.\n\nПеревод между этапами основывается на продемонстрированной компетентности и общей продуктивности, а не только на факте заполнения чек-листа.';
+/* Пункты: «~» в начале = OOC (выводится как (( … ))), « *» в конце = красная звёздочка,
+   «@» в начале = пункт с датой и ссылкой, «|текст» = серая пометка. */
+const STAGES=[
+{t:'Этап 1 — Ориентация и наблюдение',note:'',groups:[
+ ['Ориентация в классе и на станции',['Ориентация в классе','Ориентация на станции']],
+ ['Ориентация в департаменте и профессиональные стандарты',['Субординация и цепочка командования','Структура департамента','Стандарты поведения и профессионализм','Этика и подотчетность','Взаимодействие с общественностью']],
+ ['Роль патрульного и ознакомление со снаряжением',['Обязанности патрульного и обязанности на смене','Ознакомление со снаряжением и патрульным автомобилем','Основы первой помощи','~Гараж департамента и транспортные средства']],
+ ['Правовые полномочия и основы политики',['Обоснованное подозрение против достаточных оснований','Состав правонарушений','Задержание против ареста','Политика применения силы','Реагирование на критические инциденты','Политика преследования']]]},
+{t:'Этап 2 — Инструктаж и оценка',note:'Любой пункт, отмеченный звездочкой (*), должен быть практически продемонстрирован во время реального вызова службы или в ходе утвержденного учебного сценария под наблюдением. Офицер полевой подготовки документирует результаты испытуемого помощника в соответствующем отчете о полевой подготовке (Daily Observation Report).',groups:[
+ ['Патрульная связь и управление вызовами',['Радиосвязь *','MDT/CAD *','Основы реагирования на вызовы','Ведение вызова *']],
+ ['Бумажная работа, отчеты и документация',['Основная документация','Стандарты написания отчетов','Требования к ведению документации']],
+ ['Арест, предъявление обвинений и обработка дел',['Типы и классификации преступлений','Отягчающие обстоятельства / Увеличение срока наказания','~Сделки о признании вины / Судебные заявления','Права Миранды','Оформление ареста *']],
+ ['Уголовный процесс и полевое применение',['Принятие решений','Свобода действий / Дискреция офицера','Прецедентное право','Поверхностный обыск и вторичный обыск *','Обыск транспортных средств *','Неотложные обстоятельства (Exigent Circumstances)','Ордера']],
+ ['Безопасность офицера и критические инциденты',['Ситуационная осведомленность','Контакт и прикрытие *','Безопасность на месте происшествия','Забаррикадировавшиеся подозреваемые','Установка периметра инцидента *']],
+ ['Управление местом преступления и улики',['Распознавание, сохранение улик и цепочка их инстанций','Сбор и регистрация улик *','Оцепление места преступления','Предварительное расследование']],
+ ['Дорожный надзор',['Трафик-стопы *','Требования к лицензиям и их приостановление','Штрафы / Заметки','Дорожные отчеты *','Конфискация транспортных средств']],
+ ['Автомобильное оборудование и эксплуатация',['Осмотр автомобиля перед выездом *','Экстренное вождение *','Автомобильные преследования *','Фелони / Трафик-стопы повышенного риска *','Техники принудительной остановки автомобиля (VIT)']]]},
+{t:'Этап 3 — Финальная оценка и сертификация',note:'Успешное завершение Этапа 3 требует от испытуемого помощника демонстрации стабильной готовности к самостоятельному выполнению обязанностей патрульного помощника шерифа. Выполнение минимального количества дней обучения, требований к патрулированию, пунктов чек-листа или сдача экзаменов сами по себе не гарантируют сертификацию или выпуск из Программы полевой подготовки.\n\nВторичный финальный оценочный патруль может быть разрешен в том случае, если недостатки, выявленные во время первоначальной финальной оценки, признаны устранимыми и требуют дополнительного анализа.',groups:[
+ ['',['@Подача отчета об аресте','@Подача отчета об инциденте','@Подача дорожного отчета','@Кинг-патруль №1','@Кинг-патруль №2','@Кинг-патруль №3','Экзамен испытуемого помощника (Сдан)','Финальный оценочный патруль','Вторичный финальный оценочный патруль|(Если требуется)']]]}];
+
+const fmt=v=>{if(!v)return'';const[y,m,d]=v.split('-');return `${d}/${MON[m-1]}/${y}`};
+const URLRE=/^https?:\/\/\S+$/i;
+function parse(raw){
+  let s=raw,link=false,ooc=false,star=false,gray='';
+  if(s[0]=='@'){link=true;s=s.slice(1)}
+  if(s[0]=='~'){ooc=true;s=s.slice(1)}
+  if(s.includes('|'))[s,gray]=s.split('|');
+  if(s.endsWith(' *')){star=true;s=s.slice(0,-2)}
+  return{label:s,link,ooc,star,gray};
+}
+// S = {name, c:{id:true}, l:{id:url}, d:{id:iso}}
+function bb(S){
+  const bar=t=>`[BLOCK=#000000][COLOR=#ffffff][B]${t}[/B][/COLOR][/BLOCK]`;
+  const red=t=>`[CENTER][SIZE=2][COLOR=#c53030]${t}[/COLOR][/SIZE][/CENTER]`;
+  let id=0;
+  let o=`[SIZE=3][COLOR=#000000][BLOCK=#ffffff][CENTER][SIZE=4][B]${TITLE}[/B][/SIZE]\n[SIZE=2]ДЕПАРТАМЕНТ ШЕРИФА ОКРУГА ЛОС-САНТОС[/SIZE][/CENTER]${S.name.trim()?`\n[B]Испытуемый помощник:[/B] ${S.name.trim()}`:''}[/BLOCK][BLOCK=#ffffff]${red(INTRO)}[/BLOCK]`;
+  STAGES.forEach(st=>{
+    o+=`[BLOCK=#ffffff]${bar(st.t)}`+st.groups.map(g=>(g[0]?`[B]${g[0]}[/B]\n`:'')+g[1].map(raw=>{
+      const it=parse(raw),i=id++;
+      let l=`[${S.c[i]?'CBF':'CB'}][/${S.c[i]?'CBF':'CB'}] `+(it.ooc?`(( ${it.label} ))`:it.label);
+      if(it.star)l+=' [COLOR=#c53030]*[/COLOR]';
+      if(it.gray)l+=` [COLOR=gray]${it.gray}[/COLOR]`;
+      if(it.link){const u=(S.l[i]||'').trim(),d=fmt(S.d[i]);
+        if(u)l+=` — [URL=${u}]${d||'ссылка'}[/URL]`;else if(d)l+=` — ${d}`}
+      return l}).join('\n')).join('\n\n')+(st.note?`\n${red(st.note)}`:'')+'[/BLOCK]';
+  });
+  return o+'[/COLOR][/SIZE]';
+}
+/*DOM*/
+const $=id=>document.getElementById(id),KEY='lscsd-ftp-v1';
+const E=(t,p={},...k)=>{const e=document.createElement(t);Object.assign(e,p);e.append(...k);return e};
+const blank=()=>({name:'',c:{},l:{},d:{}});
+let S=blank();try{S={...blank(),...JSON.parse(localStorage.getItem(KEY))}}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const out=$('out'),st=$('st'),form=$('f');
+
+const nm=E('input',{type:'text',placeholder:'Имя испытуемого помощника (необязательно)',value:S.name,id:'nm'});
+nm.oninput=()=>{S.name=nm.value;save();update()};
+$('head').append(E('fieldset',{},E('legend',{},'Испытуемый помощник'),E('label',{className:'t',htmlFor:'nm'},'Полное имя'),nm));
+
+const stages=[],links=[],cbs=[],lks=[];let id=0;
+STAGES.forEach(sd=>{
+  const fs=E('fieldset',{},E('legend',{},sd.t)),prog=E('span',{className:'prog'}),boxes=[];
+  const setAll=(arr,v)=>arr.forEach(c=>{if(c.checked!==v){c.checked=v;c.onchange()}});
+  const a=E('button',{type:'button',className:'ghost'},'Отметить этап'),b=E('button',{type:'button',className:'ghost'},'Снять');
+  a.onclick=()=>setAll(boxes,true);b.onclick=()=>setAll(boxes,false);
+  fs.append(E('div',{className:'sbar'},prog,a,b));
+  sd.groups.forEach(g=>{
+    const gb=[];
+    if(g[0]){const t=E('button',{type:'button',className:'ghost'},'Все');t.onclick=()=>setAll(gb,!gb.every(c=>c.checked));fs.append(E('div',{className:'gh'},E('b',{},g[0]),t))}
+    g[1].forEach(raw=>{
+      const it=parse(raw),i=id++,cb=E('input',{type:'checkbox',checked:!!S.c[i]});
+      cb.onchange=()=>{S.c[i]=cb.checked;save();update()};
+      gb.push(cb);boxes.push(cb);cbs[i]=cb;
+      const txt=E('span',{},it.ooc?E('span',{className:'ooc'},'(OOC) '):'',it.label,it.star?E('span',{className:'star'},' *'):'',it.gray?E('span',{className:'gray'},' '+it.gray):'');
+      fs.append(E('label',{className:'it'},cb,txt));
+      if(it.link){
+        const d=E('input',{type:'date',value:S.d[i]||'',title:'Дата'}),u=E('input',{type:'url',placeholder:'Ссылка https://…',value:S.l[i]||''}),err=E('div',{className:'err'});
+        d.oninput=()=>{S.d[i]=d.value;save();update()};u.oninput=()=>{S.l[i]=u.value;save();update()};
+        fs.append(E('div',{className:'lk'},d,u,err));links.push({i,u,err});lks[i]={d,u};
+      }
+    });
+  });
+  if(sd.note)fs.append(E('div',{className:'note'},sd.note));
+  form.append(fs);stages.push({boxes,prog});
+});
+
+let tried=false;
+function update(){
+  out.value=bb(S);
+  stages.forEach(s=>s.prog.textContent=`Выполнено: ${s.boxes.filter(c=>c.checked).length} из ${s.boxes.length}`);
+  let bad=null;
+  links.forEach(l=>{const v=l.u.value.trim(),m=v&&!URLRE.test(v)?'Нужна ссылка вида https://…':'';l.err.textContent=m;if(m&&!bad)bad=l});
+  const tot=stages.reduce((a,s)=>a+s.boxes.filter(c=>c.checked).length,0),all=stages.reduce((a,s)=>a+s.boxes.length,0);
+  st.textContent=bad?'Исправьте ссылку':`Всего отмечено: ${tot} из ${all}`;
+  return bad;
+}
+$('cb').onclick=async()=>{
+  const bad=update();if(bad){bad.u.focus();return}
+  const text=bb(S);
+  try{await navigator.clipboard.writeText(text)}catch(e){out.value=text;out.select();document.execCommand('copy')}
+  st.textContent='Скопировано. Вставьте в редактор в режиме [ ]';
+};
+$('clr').onclick=()=>{if(confirm('Сбросить все отметки и данные?')){S=blank();save();location.reload()}};
+
+const norm=s=>s.replace(/\[[^\]]*\]/g,' ').replace(/[()*—]/g,' ').replace(/стажера/gi,'испытуемого помощника').replace(/\s+/g,' ').trim().toLowerCase();
+const ITEMS=[];STAGES.forEach(sd=>sd.groups.forEach(g=>g[1].forEach(r=>ITEMS.push(norm(parse(r).label)))));
+function importBB(t){
+  const N=blank(),nmm=t.match(/(?:Стажёр|Испытуемый помощник):\[\/B\]\s*([^\n\[]+)/i);if(nmm)N.name=nmm[1].trim();
+  let found=0,miss=0,ch=0,lk=0;
+  t.split(/\r?\n/).forEach(line=>{
+    const m=line.match(/\[(cbf|cb)\]\s*\[\/\1\]\s*(.*)$/i);if(!m)return;
+    const n=norm(m[2]);let best=-1;
+    ITEMS.forEach((x,i)=>{if(n.startsWith(x)&&(best<0||x.length>ITEMS[best].length))best=i});
+    if(best<0){miss++;return}
+    found++;
+    if(m[1].toLowerCase()=='cbf'){N.c[best]=true;ch++}
+    const u=m[2].match(/\[url=([^\]]+)\]/i);if(u&&!/LINK/i.test(u[1])){N.l[best]=u[1].trim();lk++}
+    const d=m[2].match(/(\d{1,2})\/([A-Za-z]{3})\/(\d{4})/),mi=d?MON.indexOf(d[2].toUpperCase()):-1;
+    if(mi>=0)N.d[best]=`${d[3]}-${String(mi+1).padStart(2,'0')}-${d[1].padStart(2,'0')}`;
+  });
+  return{N,found,miss,ch,lk};
+}
+$('load').onclick=()=>{
+  const r=importBB($('imp').value),msg=$('impst');
+  if(!r.found){msg.textContent='Не найдено пунктов чек-листа. Вставьте ББ-код целиком, как в теме (режим [ ]).';return}
+  if(Object.values(S.c).some(Boolean)&&!confirm('Заменить текущие отметки загруженными?'))return;
+  S=r.N;save();nm.value=S.name;
+  cbs.forEach((c,i)=>{c.checked=!!S.c[i]});
+  lks.forEach((x,i)=>{if(x){x.d.value=S.d[i]||'';x.u.value=S.l[i]||''}});
+  update();
+  msg.textContent=`Загружено: пунктов ${r.found}, отмечено ${r.ch}, ссылок ${r.lk}`+(r.miss?`. Не распознано строк: ${r.miss}`:'')+'.';
+};
+update();
+</script>
+</body>
+</html>
