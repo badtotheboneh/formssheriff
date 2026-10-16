@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Генератор приказов: станция Леннокс</title>
+<style>
+:root{--bg:#eef0ec;--card:#fff;--ink:#1a202c;--mute:#5d6770;--line:#d5d9d2;--acc:#344434;--acc2:#4b6350}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Segoe UI",Roboto,Arial,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 110px}
+h1{font-size:26px;margin:0 0 6px}
+.lead{margin:0 0 18px;color:var(--mute)}
+.nav{display:inline-block;margin:0 14px 10px 0;color:var(--acc);font-weight:600}
+fieldset{background:var(--card);border:1px solid var(--line);border-radius:6px;margin:0 0 16px;padding:8px 18px 18px}
+legend{background:var(--acc);color:#fff;font-weight:600;padding:5px 12px;border-radius:4px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px 16px;margin-top:10px}
+.big{grid-column:1/-1}
+label.t{display:block;font-weight:600;font-size:14px;margin-bottom:4px}
+.hint{font-weight:400;color:var(--mute)}
+input[type=text],textarea{width:100%;font:inherit;padding:8px 10px;border:1px solid #b9c0b6;border-radius:4px;background:#fbfcfb;color:var(--ink)}
+textarea{min-height:110px;resize:vertical}
+:focus-visible{outline:3px solid #9fc2a6;outline-offset:1px}
+.err{color:#b3261e;font-size:13px;margin-top:3px}
+.ex{border:1px dashed #b9c0b6;border-radius:6px;padding:10px;margin-top:12px;display:grid;gap:8px}
+.exh{display:flex;gap:8px}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:12px 16px;display:flex;gap:10px 12px;align-items:center;justify-content:center;flex-wrap:wrap}
+button{font:inherit;font-weight:600;background:var(--acc);color:#fff;border:0;border-radius:4px;padding:10px 18px;cursor:pointer}
+button:hover{background:var(--acc2)}
+.ghost{background:none;color:var(--acc);border:1px solid var(--acc);padding:8px 14px}
+.ghost:hover{background:#e3e9e3}
+.bar .ghost{font-size:inherit}
+#st{color:var(--mute);font-size:14px}
+details{margin-top:8px}summary{cursor:pointer;color:var(--mute)}
+#out{min-height:240px;font:13px/1.35 Consolas,monospace;margin-top:8px}
+</style>
+</head>
+<body>
+<main>
+<a class="nav" href="index.html">← Заявка на восстановление</a><a class="nav" href="responses.html">Формы ответов</a>
+<h1>Приказ подразделения</h1>
+<p class="lead">Заполните поля, скопируйте заголовок темы и ББ-код (вставляйте в редакторе в режиме <b>[ ]</b>). Имена, звания и название приказа автоматически приводятся к ЗАГЛАВНЫМ буквам, как в бланке. Черновик сохраняется в браузере.</p>
+<form id="f" onsubmit="return false"></form>
+<details><summary>Показать готовый ББ-код</summary><textarea id="out" readonly></textarea></details>
+</main>
+<div class="bar"><button id="ct" type="button" class="ghost">Скопировать заголовок</button><button id="cb" type="button">Скопировать ББ-код</button><button id="nw" type="button" class="ghost">Новый приказ</button><span id="st"></span></div>
+
+<script>
+const FORM_CODE='SH-AD-32A';
+const yy=String(new Date().getFullYear()).slice(2);
+const up=s=>s.trim().toUpperCase();
+const title=S=>`Приказ ${S.num.trim()} — ${S.title.trim()}`;
+// S = {station,from,to,num,title,purpose,scope,order,ooc,extra:[{h,t}]}
+function bb(S){
+  const st=up(S.station),U=t=>`[U][B]${t}[/B][/U]`;
+  const ord=S.order.trim()+(S.ooc.trim()?`\n\n[B](( ${S.ooc.trim()} ))[/B]`:'');
+  const secs=[['ЦЕЛЬ',S.purpose.trim()],['ОБЛАСТЬ ПРИМЕНЕНИЯ',S.scope.trim()],['ПРИКАЗ',ord],
+    ...S.extra.filter(e=>e.h.trim()||e.t.trim()).map(e=>[up(e.h)||'ПРИМЕЧАНИЕ',e.t.trim()])];
+  return `[SIZE=3][COLOR=#000000][BLOCK=#edf3f7][SIZE=1]${FORM_CODE}[/SIZE]\n`+
+   `[CENTER][SIZE=2][B]ОКРУГ ЛОС-САНТОС[/B][/SIZE]\n[SIZE=5][B]ДЕПАРТАМЕНТ ШЕРИФА[/B][/SIZE]\n[I]«Традиция служения с 1850 года»[/I]\n[U]ОФИЦИАЛЬНАЯ ПЕРЕПИСКА[/U][/CENTER]\n`+
+   `[TABLE2][TR2][TD2][B]ОТ:[/B][/TD2][TD2]${up(S.from)}\nСТАНЦИЯ ${st}[/TD2][TD2][B]КОМУ:[/B][/TD2][TD2]${up(S.to)}\nСТАНЦИЯ ${st}[/TD2][/TR2][/TABLE2]\n`+
+   `[B]ТЕМА: ПРИКАЗ ПОДРАЗДЕЛЕНИЯ ${S.num.trim()} — ${up(S.title)}[/B]\n\n`+
+   secs.map(([h,t])=>`${U(h)}\n${t}`).join('\n\n')+`[/BLOCK][/COLOR][/SIZE]`;
+}
+/*DOM*/
+const $=id=>document.getElementById(id),KEY='lscsd-orders-v1';
+const E=(t,p={},...k)=>{const e=document.createElement(t);Object.assign(e,p);e.append(...k);return e};
+const blank=()=>({station:'Леннокс',from:'',to:'Всему личному составу',num:`01-${yy}`,title:'',purpose:'',scope:'Весь личный состав станции Леннокс.',order:'',ooc:'',extra:[]});
+let S=blank(),tried=false;
+try{S={...blank(),...JSON.parse(localStorage.getItem(KEY))}}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const form=$('f'),out=$('out'),st=$('st'),errs={},els={};
+// [ключ, подпись, тип, подсказка, обязательное, класс]
+const F1=[['station','Станция','text','Например: Леннокс',1],['from','От кого (ФИО, звание)','text','Например: Carla Graves, Sergeant',1],['to','Кому','text','Например: Всему личному составу',1],['num','Номер приказа','text','01-26',1]];
+const F2=[['title','Название приказа','text','Например: Обращение с уликами и парковка у станции',1,'big'],
+ ['purpose','Цель','area','Для чего издаётся приказ',1,'big'],
+ ['scope','Область применения','text','На кого распространяется',1,'big'],
+ ['order','Приказ','area','Текст приказа. Абзацы разделяйте пустой строкой.',1,'big'],
+ ['ooc','OOC-примечание (необязательно)','area','Будет оформлено жирным в (( двойных скобках )). Скобки вводить не нужно.',0,'big']];
+const mk=([k,l,ty,ph,req,cls])=>{
+  const el=E(ty=='area'?'textarea':'input',{placeholder:ph,id:'i_'+k});if(ty!='area')el.type='text';
+  el.value=S[k];el.addEventListener('input',()=>{S[k]=el.value;save();update()});
+  const err=E('div',{className:'err'});errs[k]=err;els[k]=el;
+  return E('div',{className:cls||''},E('label',{className:'t',htmlFor:'i_'+k},l+(req?' *':'')),el,err)};
+form.append(E('fieldset',{},E('legend',{},'Шапка'),E('div',{className:'grid'},...F1.map(mk))));
+const body=E('fieldset',{},E('legend',{},'Содержание'),E('div',{className:'grid'},...F2.map(mk)));
+const exBox=E('div',{}),addB=E('button',{type:'button',className:'ghost'},'+ Добавить раздел');
+body.append(exBox,E('div',{style:'margin-top:12px'},addB));form.append(body);
+
+function drawEx(){
+  exBox.textContent='';
+  S.extra.forEach((e,i)=>{
+    const h=E('input',{type:'text',placeholder:'Название раздела (например: Дисциплинарная ответственность)',value:e.h}),
+      t=E('textarea',{placeholder:'Текст раздела',value:e.t}),
+      rm=E('button',{type:'button',className:'ghost'},'Удалить');
+    h.oninput=()=>{e.h=h.value;save();update()};t.oninput=()=>{e.t=t.value;save();update()};
+    rm.onclick=()=>{S.extra.splice(i,1);save();drawEx();update()};
+    exBox.append(E('div',{className:'ex'},E('div',{className:'exh'},h,rm),t));
+  });
+}
+addB.onclick=()=>{S.extra.push({h:'',t:''});save();drawEx();update()};
+
+function problems(){
+  const p={};[...F1,...F2].forEach(f=>{if(f[4]&&!S[f[0]].trim())p[f[0]]='Заполните поле'});
+  if(S.num.trim()&&!/^\d{1,3}-\d{2}$/.test(S.num.trim()))p.num='Формат номера: 01-26';
+  return p;
+}
+function update(){
+  const p=problems(),ks=Object.keys(p);
+  Object.keys(errs).forEach(k=>errs[k].textContent=tried?(p[k]||''):'');
+  out.value=bb(S);
+  st.textContent=ks.length?`Нужно заполнить или исправить: ${ks.length}`:'Всё готово, можно копировать';
+  return ks[0];
+}
+async function copy(text,msg){
+  try{await navigator.clipboard.writeText(text)}catch(e){out.value=text;out.select();document.execCommand('copy')}
+  st.textContent=msg;
+}
+function guard(keys){
+  tried=true;const first=update(),k=keys?keys.find(x=>problems()[x]):first;
+  if(k){els[k].scrollIntoView({block:'center',behavior:'smooth'});els[k].focus({preventScroll:true});return false}
+  return true;
+}
+$('ct').onclick=()=>guard(['num','title'])&&copy(title(S),'Заголовок скопирован. Вставьте его в поле «Заголовок темы»');
+$('cb').onclick=()=>guard()&&copy(bb(S),'ББ-код скопирован. Вставьте в редактор в режиме [ ]');
+$('nw').onclick=()=>{
+  if(!confirm('Начать новый приказ? Текст приказа будет очищен, шапка и номер (+1) сохранятся.'))return;
+  const m=S.num.trim().match(/^(\d+)-(\d+)$/),n=m?String(+m[1]+1).padStart(m[1].length,'0')+'-'+m[2]:S.num;
+  S={...blank(),station:S.station,from:S.from,to:S.to,num:n,scope:S.scope};save();location.reload();
+};
+drawEx();update();
+</script>
+</body>
+</html>
