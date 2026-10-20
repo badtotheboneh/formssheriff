@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OSS — генератор форм XenForo</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:0 0 80px;font:14px system-ui,sans-serif;background:#eef0ee;color:#1a202c}
+.page{max-width:900px;margin:0 auto;padding:12px}
+.hint{background:#fffbe0;border:1px solid #e6d98a;border-radius:4px;padding:8px 12px;margin-bottom:10px}
+.hint i{display:inline-block;width:44px;height:14px;background:#fff0a0;border:1px dashed #d4a800;vertical-align:middle;margin-right:8px}
+.top{display:flex;gap:8px;margin-bottom:10px}
+select,button,input,textarea{font:inherit;color:#1a202c}
+.top select{flex:1;padding:10px;border:1px solid #9aa;border-radius:4px;background:#fff;font-size:15px}
+button{padding:7px 12px;border:1px solid #1b3a2a;border-radius:4px;background:#fff;cursor:pointer}
+button.pri{background:#1b3a2a;color:#fff;font-weight:600;padding:10px 18px}
+.mail{background:#fff;border:1px solid #c9cfc9;line-height:1.5;margin-bottom:10px}
+.mail ul{margin:2px 0;padding-left:22px;list-style:none}
+.mail li{margin:2px 0}
+.mail table{border-collapse:collapse;width:100%}
+.mail td{border-bottom:1px solid #e3e6e3;padding:2px 8px;vertical-align:top}
+.mail td:first-child{width:36%;white-space:nowrap}
+.mail .blk{padding:6px 10px;border-bottom:1px solid #e3e6e3}.mail .ind{margin-left:24px}
+.mail hr{border:0;border-top:1px solid #1a202c}
+.in{background:#fff0a0;border:1px dashed #d4a800;padding:1px 6px;width:100%;margin:0}
+.in:focus{outline:2px solid #1b3a2a;background:#fff6c0}
+textarea.in{display:block;min-height:56px;resize:vertical}
+li .in,.blk>.in,.ind>.in{width:calc(100% - 34px)}
+.x{float:right;color:#c00;border:0;background:none;padding:0 4px;font-size:15px}
+.ad{border:1px dashed #1b3a2a;background:#fff;padding:2px 8px;font-size:13px;font-weight:600;margin:3px 0}
+details{margin:10px 0}
+#out{width:100%;height:220px;font:12px ui-monospace,monospace}
+.bot{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #ccc;padding:10px;display:flex;gap:10px;align-items:center;justify-content:center}
+</style></head><body>
+<div class="page">
+ <div class="hint"><i></i>Жёлтым подсвечены поля для ввода. «+ Добавить» и ✕ управляют строками списков.</div>
+ <div class="top"><select id="sel"></select><button id="lnk">Скопировать ссылку на форму</button></div>
+ <div class="mail" id="pv"></div>
+ <details><summary>Показать готовый ББ-код</summary><textarea id="out" readonly></textarea></details>
+</div>
+<div class="bot"><button class="pri" id="cp">Скопировать ББ-код</button><button id="clr">Очистить форму</button><span id="st"></span></div>
+<datalist id="dl"></datalist>
+<script>
+const $=s=>document.querySelector(s),
+esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const ST={'ПОДОЗРЕВАЕМЫЙ':'#4000BF','ОБВИНЯЕМЫЙ':'#b91c1c','СВИДЕТЕЛЬ':'green','ПОТЕРПЕВШИЙ':'#0e7490','ИНФОРМАТОР':'#b45309'};
+const PRE=['Участие в преступной группировке (уличной банде)','Незаконный оборот оружия','Незаконный оборот наркотических веществ','Вымогательство и рэкет','Насильственные действия','Вовлечение несовершеннолетних в деятельность группировки'];
+$('#dl').innerHTML=PRE.map(x=>`<option value="${x}">`).join('');
+/* состояние и поля */
+let UI=false;const V=new Map(),C=new Map();
+const val=id=>(V.get(id)||'').trim();
+const tk=o=>`\u0001${JSON.stringify(o)}\u0002`;
+const F=(id,ph,o={})=>UI?tk({id,ph,...o}):(val(id)||`{${ph}}`);
+const RM=(g,i)=>UI?tk({b:'rm',g,i}):'';
+const ADD=(g,lab)=>UI?'\n'+tk({b:'add',g,lab}):'';
+const R=(g,fn,sep='\n')=>{const n=C.has(g)?C.get(g):1,s=[];for(let i=0;i<n;i++)s.push(fn(i));return s.join(sep)};
+/* BBCode-каркас: только теги XenForo (BLOCK, SIZE 1-7, INDENT, LIST, TABLE2) — как в референсе ossbgb */
+const G1='#f6f9f7',G2='#ffffff';
+const HEAD='[BLOCK=#005500][CENTER][SIZE=5][COLOR=#ffffff][B]БЮРО ОПЕРАЦИИ БЕЗОПАСНЫХ УЛИЦ[/B][/COLOR][/SIZE]\n[SIZE=2][COLOR=#b6ce5f]OPERATION SAFE STREETS BUREAU[/COLOR][/SIZE][/CENTER][/BLOCK]';
+const FOOT=()=>`[BLOCK=#005500][CENTER][SIZE=1][COLOR=#ffffff]Документ создан: ${F('dc','ДД.ММ.ГГГГ',{w:9})} | Последнее обновление: ${F('du','ДД.ММ.ГГГГ',{w:9})}\n[COLOR=#b6ce5f]НЕСАНКЦИОНИРОВАННОЕ РАСПРОСТРАНЕНИЕ ПРЕСЛЕДУЕТСЯ ПО ЗАКОНУ[/COLOR][/COLOR][/SIZE][/CENTER][/BLOCK]`;
+const wrap=(...p)=>`[SIZE=3][COLOR=#1a202c]${p.join('')}[/COLOR][/SIZE]`;
+const ind=s=>`[INDENT]${s}[/INDENT]`;
+const grid=r=>'[TABLE2]'+r.map(([k,v])=>`[TR2][TD2][B]${k}:[/B][/TD2][TD2]${v}[/TD2][/TR2]`).join('')+'[/TABLE2]';
+const sec=(bg,t,b)=>`[BLOCK=${bg}][B][COLOR=#005500]${t}[/COLOR][/B]${b.startsWith('[INDENT]')?'':'\n'}${b}[/BLOCK]`;
+const A={t:'a'},DT={w:9};
+const T={
+f1:()=>wrap(HEAD,
+ sec(G1,'РЕГИСТРАЦИОННЫЕ ДАННЫЕ',grid([['Имя фамилия сотрудника',F('officer','Имя Фамилия')],['Номер Кейс-Файла',F('caseNo','OSS-0000')],['Дата открытия',F('opened','ДД.ММ.ГГГГ',DT)],['Дата закрытия',F('closed','ДД.ММ.ГГГГ или в процессе')],['Оперативная группа',F('unit','Группа')],['Категория дела',F('kind','Уличная банда / ОПГ')],['Ответственные детективы',R('inv',i=>F(`inv.${i}.v`,'Имя Фамилия, Должность')+RM('inv',i))+ADD('inv','детектив')]])),
+ sec(G2,'ПРЕДЪЯВЛЯЕМЫЕ ОБВИНЕНИЯ',R('ch',i=>`${i+1}. ${F(`ch.${i}.v`,'Обвинение — описание',{dl:1})}${RM('ch',i)}`)+ADD('ch','обвинение')),
+ sec(G1,'ОПИСАНИЕ ИНЦИДЕНТА',`[B]Детальное описание произошедшего:[/B]`+ind(F('desc','Описание инцидента',A))+grid([['Заявитель',F('app','Имя Фамилия, адрес, телефон, дата рождения')],['Связанная группировка',F('gang','Название')],['Территория / район',F('terr','Район')],['Локация',F('loc','Локация, ДД.ММ.ГГГГ в ЧЧ:ММ')]])),
+ sec(G2,'ДОКАЗАТЕЛЬНАЯ БАЗА',[['Вещественные доказательства (оружие, наркотики, изъятое)','ev1','Описание изъятых улик'],['Свидетельские показания','ev2','Информация о свидетелях, их показаниях'],['Экспертные заключения','ev3','Результаты экспертиз'],['Оперативные материалы (наблюдение, ОРМ)','ev4','Данные деятельности']].map(([l,id,p])=>`[B]${l}:[/B]`+ind(F(id,p,A))).join('')),
+ FOOT()),
+f2:()=>wrap(HEAD,R('p',k=>{const q=x=>`p.${k}.${x}`,g=`p.${k}.i`,s=val(q('st'));return sec(k%2?G2:G1,`УЧАСТНИК №${k+1}${RM('p',k)}`,grid([['ИМЯ, ФАМИЛИЯ',F(q('name'),'Имя Фамилия')],['ТЕКУЩИЙ СТАТУС',`[COLOR=${ST[s]||'#4000BF'}]${F(q('st'),'Статус',{o:Object.keys(ST).join('|')})}[/COLOR]`],['КЛИЧКА / ПОЗЫВНОЙ',F(q('alias'),'Кличка')],['ГРУППИРОВКА',F(q('gang'),'Название')],['РОЛЬ В ГРУППИРОВКЕ',F(q('role'),'Роль')],['НОМЕР ТЕЛЕФОНА',F(q('ph'),'000-000')],['АДРЕС',F(q('addr'),'Адрес')],['СРЕДСТВА ПЕРЕДВИЖЕНИЯ',F(q('veh'),'Марка, модель, цвет, номер')],['ПОЛ',F(q('sex'),'Пол',{o:'Мужской|Женский'})],['РАСА',F(q('race'),'Раса')],['БЛИЖАЙШИЕ РОДСТВЕННИКИ',F(q('rel'),'Не установлено')],['ТАТУИРОВКИ / ПРИМЕТЫ',F(q('tat'),'Не установлено')],['ИЗВЕСТНЫЕ СООБЩНИКИ',F(q('as'),'Не установлено')]])+`\n[B]ЛИЧНАЯ ИНФОРМАЦИЯ:[/B]\n[LIST]${R(g,j=>`[*]${F(`${g}.${j}.v`,'Репортом от ДД.ММ.ГГГГ #N — …')}${RM(g,j)}`,'')}[/LIST]${ADD(g,'пункт')}`)},'')+ADD('p','участника'),FOOT()),
+f3:()=>wrap(HEAD,`[BLOCK=${G1}][B]${F('rdate','ДД.ММ.ГГГГ',DT)}[/B]\n[CENTER][SIZE=4][B]СЛУЖЕБНЫЙ РЕПОРТ #${F('rnum','N',{w:4})}[/B][/SIZE][/CENTER]\n${F('rbody','Текст репорта: мероприятия, опросы, выводы',{t:'a',r:8})}\n[RIGHT][B]БЮРО ОПЕРАЦИИ БЕЗОПАСНЫХ УЛИЦ[/B]\n[I]${F('rrole','Должность',{w:14})} ${F('rname','Имя Фамилия',{w:14})}[/I][/RIGHT][/BLOCK]`,FOOT())};
+const NAMES={f1:'Кейс-файл: регистрационные данные и обвинения',f2:'Information Card: участники дела',f3:'Служебный репорт'};
+$('#sel').innerHTML=Object.entries(NAMES).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
+let cur=location.hash.slice(1);if(!T[cur])cur='f1';$('#sel').value=cur;
+/* предпросмотр: мини-парсер BBCode + поля */
+function tok(j){
+ if(j.b=='rm')return `<button class="x" data-rm="${j.g}|${j.i}" title="Удалить">✕</button>`;
+ if(j.b=='add')return `<button class="ad" data-add="${j.g}">+ Добавить ${esc(j.lab)}</button>`;
+ if(j.o&&!V.has(j.id))V.set(j.id,j.o.split('|')[0]);
+ const c=V.get(j.id)||'',a=`class="in" data-id="${j.id}" placeholder="${esc(j.ph)}"`;
+ if(j.t=='a')return `<textarea ${a} rows="${j.r||3}">${esc(c)}</textarea>`;
+ if(j.o)return `<select ${a} data-s>${j.o.split('|').map(x=>`<option${x==c?' selected':''}>${x}</option>`).join('')}</select>`;
+ return `<input ${a} value="${esc(c)}"${j.dl?' list="dl"':''}${j.w?` style="width:${j.w}em"`:''}>`;
+}
+function render(s){
+ s=s.replace(/\n*(\[\/?(?:TABLE2|TR2|TD2|BLOCK|INDENT|LIST|CENTER|RIGHT)(?:=[^\]]*)?\])\n*/gi,'$1').replace(/\n+(\[\*\]|\[\/list\])/gi,'$1');
+ const SZ={1:.75,2:.85,3:1,4:1.25,5:1.5,6:1.8,7:2.2};
+ const O={color:a=>[`<span style="color:${a}">`,'</span>'],block:a=>[`<div class="blk" style="background:${/^#?[\w]+$/.test(a||'')?a:'#fff'}">`,'</div>'],indent:()=>['<div class="ind">','</div>'],center:()=>['<div style="text-align:center">','</div>'],right:()=>['<div style="text-align:right">','</div>'],size:a=>[`<span style="font-size:${SZ[a]||1}em">`,'</span>'],font:a=>[`<span style="font-family:${a}">`,'</span>'],b:()=>['<b>','</b>'],i:()=>['<i>','</i>'],list:()=>['<ul>','</ul>'],table2:()=>['<table>','</table>'],tr2:()=>['<tr>','</tr>'],td2:()=>['<td>','</td>']};
+ const re=/\[(\/?)([a-z0-9*]+)(?:=([^\]]*))?\]/gi;
+ const tx=t=>t.split(/\u0001(.*?)\u0002/).map((p,k)=>k%2?tok(JSON.parse(p)):esc(p).replace(/\n/g,'<br>')).join('');
+ let out='',i=0,m,st=[];
+ while(m=re.exec(s)){
+  out+=tx(s.slice(i,m.index));i=re.lastIndex;const t=m[2].toLowerCase();
+  if(t==='*'){out+='<li>';continue}
+  if(m[1]){const k=st.map(x=>x.t).lastIndexOf(t);if(k>=0)while(st.length>k)out+=st.pop().c;continue}
+  const o=O[t];if(!o){out+=esc(m[0]);continue}
+  const [a,c]=o(m[3]);out+=a;if(c)st.push({t,c});
+ }
+ out+=tx(s.slice(i));while(st.length)out+=st.pop().c;return out;
+}
+function draw(){UI=true;$('#pv').innerHTML=render(T[cur]());UI=false;bb()}
+function bb(){$('#out').value=T[cur]()}
+function shift(g,k){
+ const re=new RegExp('^'+g.replace(/\./g,'\\.')+'\\.(\\d+)(.*)$');
+ for(const M of[V,C]){const e=[...M];M.clear();for(const [key,v] of e){const m=key.match(re);if(!m){M.set(key,v);continue}const i=+m[1];if(i==k)continue;M.set(g+'.'+(i>k?i-1:i)+m[2],v)}}
+ C.set(g,(C.has(g)?C.get(g):1)-1);
+}
+/* события */
+const pv=$('#pv');
+pv.addEventListener('input',e=>{if(e.target.dataset.id){V.set(e.target.dataset.id,e.target.value);bb()}});
+pv.addEventListener('change',e=>{if(e.target.dataset.s)draw()});
+pv.addEventListener('click',e=>{
+ const t=e.target;
+ if(t.dataset.add){const g=t.dataset.add;C.set(g,(C.has(g)?C.get(g):1)+1);draw()}
+ else if(t.dataset.rm){const [g,i]=t.dataset.rm.split('|');shift(g,+i);draw()}
+});
+$('#sel').onchange=e=>{cur=e.target.value;location.hash=cur;draw()};
+const note=m=>{$('#st').textContent=m;setTimeout(()=>$('#st').textContent='',1800)};
+$('#cp').onclick=()=>{const o=$('#out');o.select();(navigator.clipboard?navigator.clipboard.writeText(o.value):Promise.reject()).catch(()=>document.execCommand('copy'));note('Скопировано ✓')};
+$('#lnk').onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(location.href);note('Ссылка скопирована ✓')};
+$('#clr').onclick=()=>{if(confirm('Очистить все поля?')){V.clear();C.clear();draw()}};
+draw();
+</script></body></html>
