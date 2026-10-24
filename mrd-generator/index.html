@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#052943">
+    <title>Генератор бюллетеней LSSD</title>
+    <style>
+        :root {
+            color-scheme: light;
+            font-family: Arial, sans-serif;
+            color: #1d2933;
+            background: #edf1f5;
+        }
+
+        * { box-sizing: border-box; }
+        body { margin: 0; }
+        header {
+            padding: 24px max(20px, calc((100vw - 1180px) / 2));
+            background: #052943;
+            color: white;
+        }
+        header h1 { margin: 0 0 6px; font-size: 24px; }
+        header p { margin: 0; color: #d4e1eb; }
+        main {
+            display: grid;
+            grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
+            gap: 20px;
+            max-width: 1220px;
+            margin: 24px auto;
+            padding: 0 20px;
+            align-items: start;
+        }
+        .panel {
+            padding: 20px;
+            background: white;
+            border: 1px solid #d6dee5;
+            border-radius: 8px;
+            box-shadow: 0 3px 12px #05294312;
+        }
+        .panel h2 { margin: 0 0 12px; font-size: 18px; color: #052943; }
+        .panel p { margin: 0 0 16px; color: #5a6772; font-size: 14px; line-height: 1.5; }
+        .upload { margin: 0 0 16px; }
+        .upload label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 700; }
+        input[type=file] { width: 100%; font-size: 13px; }
+        .actions { display: grid; gap: 9px; margin-top: 20px; }
+        button {
+            min-height: 42px;
+            padding: 9px 14px;
+            border: 1px solid #052943;
+            border-radius: 5px;
+            background: white;
+            color: #052943;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        button.primary { background: #052943; color: white; }
+        button:disabled { cursor: wait; opacity: .65; }
+        #status { min-height: 20px; margin: 12px 0 0; font-size: 13px; }
+        #status.error { color: #a51d22; }
+        .preview {
+            min-width: 0;
+            overflow: auto;
+            padding: 12px;
+            border-radius: 8px;
+            background: #dfe5ea;
+        }
+        #bulletin-frame {
+            display: block;
+            width: 800px;
+            height: 1400px;
+            margin: 0 auto;
+            border: 0;
+            background: white;
+            box-shadow: 0 2px 14px #0003;
+        }
+        @media (max-width: 800px) {
+            main { grid-template-columns: 1fr; margin-top: 16px; }
+            .preview { padding: 8px; }
+            #bulletin-frame { margin: 0; transform-origin: top left; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Генератор бюллетеней LSSD</h1>
+        <p>Редактируйте текст прямо в макете, добавьте изображения и скачайте готовый PNG.</p>
+    </header>
+    <main>
+        <section class="panel" aria-labelledby="settings-title">
+            <h2 id="settings-title">Изображения</h2>
+            <p>Нажмите на текст в макете, чтобы изменить его. Выбранные файлы обрабатываются в браузере и не отправляются на сервер.</p>
+            <div class="upload">
+                <label for="photo-1">Фото 1</label>
+                <input id="photo-1" type="file" accept="image/*" data-target="mrd-photo-1">
+            </div>
+            <div class="upload">
+                <label for="photo-2">Фото 2</label>
+                <input id="photo-2" type="file" accept="image/*" data-target="mrd-photo-2">
+            </div>
+            <div class="upload">
+                <label for="badge">Герб / логотип</label>
+                <input id="badge" type="file" accept="image/*" data-target="mrd-badge-logo">
+            </div>
+            <div class="upload">
+                <label for="header-image">Фото в шапку</label>
+                <input id="header-image" type="file" accept="image/*" data-target="mrd-header-image">
+            </div>
+            <div class="actions">
+                <button class="primary" id="download" type="button">Скачать PNG</button>
+                <button id="reset" type="button">Сбросить макет</button>
+            </div>
+            <p id="status" role="status" aria-live="polite"></p>
+        </section>
+        <section class="preview" aria-label="Предпросмотр бюллетеня">
+            <iframe id="bulletin-frame" title="Редактируемый макет бюллетеня" src="mrd_alert_asset.html"></iframe>
+        </section>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        (function () {
+            var frame = document.getElementById('bulletin-frame');
+            var status = document.getElementById('status');
+            var downloadButton = document.getElementById('download');
+            var imageInputs = document.querySelectorAll('input[type="file"]');
+
+            function getDocument() {
+                return frame.contentDocument;
+            }
+
+            function showStatus(message, isError) {
+                status.textContent = message;
+                status.classList.toggle('error', Boolean(isError));
+            }
+
+            function setImage(input, dataUrl) {
+                var doc = getDocument();
+                var target = doc && doc.getElementById(input.dataset.target);
+                if (!target) {
+                    throw new Error('Не найден элемент макета для изображения.');
+                }
+                if (target.tagName === 'IMG') {
+                    target.src = dataUrl;
+                } else if (target.id === 'mrd-badge-logo') {
+                    target.style.backgroundImage = 'url("' + dataUrl + '")';
+                } else if (target.id === 'mrd-header-image') {
+                    target.style.backgroundImage = 'linear-gradient(rgba(0, 0, 0, .6), rgba(0, 0, 0, .6)), url("' + dataUrl + '")';
+                }
+            }
+
+            imageInputs.forEach(function (input) {
+                input.addEventListener('change', function () {
+                    var file = input.files && input.files[0];
+                    if (!file) return;
+                    if (!file.type.startsWith('image/')) {
+                        showStatus('Выберите файл изображения.', true);
+                        input.value = '';
+                        return;
+                    }
+
+                    var reader = new FileReader();
+                    reader.onload = function () {
+                        try {
+                            setImage(input, reader.result);
+                            showStatus('Изображение добавлено.', false);
+                        } catch (error) {
+                            showStatus(error.message, true);
+                        }
+                    };
+                    reader.onerror = function () {
+                        showStatus('Не удалось прочитать выбранный файл.', true);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            });
+
+            function initializeFrame() {
+                var doc = getDocument();
+                if (!doc) {
+                    showStatus('Не удалось загрузить макет. Откройте страницу через GitHub Pages или локальный веб-сервер.', true);
+                    return;
+                }
+                doc.body.classList.add('mrd-editing');
+                doc.querySelectorAll('[id^="mrd-"]').forEach(function (element) {
+                    if (element.id !== 'mrd-badge-logo' && element.id !== 'mrd-photo-1' && element.id !== 'mrd-photo-2' && element.id !== 'mrd-header-image') {
+                        element.setAttribute('contenteditable', 'true');
+                    }
+                });
+            }
+
+            frame.addEventListener('load', initializeFrame);
+            if (getDocument() && getDocument().readyState === 'complete') initializeFrame();
+
+            downloadButton.addEventListener('click', async function () {
+                var doc = getDocument();
+                var bulletin = doc && doc.querySelector('.bulletin-container');
+                if (!bulletin) {
+                    showStatus('Макет еще не загружен.', true);
+                    return;
+                }
+                if (typeof window.html2canvas !== 'function') {
+                    showStatus('Не загрузился модуль экспорта PNG. Проверьте подключение к интернету и обновите страницу.', true);
+                    return;
+                }
+
+                downloadButton.disabled = true;
+                showStatus('Подготавливаю изображение...', false);
+                doc.body.classList.remove('mrd-editing');
+                doc.querySelectorAll('[contenteditable]').forEach(function (element) {
+                    element.blur();
+                });
+
+                try {
+                    if (doc.fonts && doc.fonts.ready) await doc.fonts.ready;
+                    var canvas = await window.html2canvas(bulletin, {
+                        backgroundColor: '#ffffff',
+                        scale: 2,
+                        useCORS: true,
+                        logging: false
+                    });
+                    var link = document.createElement('a');
+                    link.download = 'lssd-special-bulletin.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    showStatus('PNG готов и скачан.', false);
+                } catch (error) {
+                    showStatus('Не удалось создать PNG. Проверьте изображения в макете и попробуйте снова.', true);
+                    console.error(error);
+                } finally {
+                    doc.body.classList.add('mrd-editing');
+                    downloadButton.disabled = false;
+                }
+            });
+
+            document.getElementById('reset').addEventListener('click', function () {
+                imageInputs.forEach(function (input) { input.value = ''; });
+                frame.src = 'mrd_alert_asset.html';
+                showStatus('Макет сброшен.', false);
+            });
+        }());
+    </script>
+</body>
+</html>
