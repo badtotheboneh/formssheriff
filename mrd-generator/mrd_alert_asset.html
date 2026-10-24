@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LSSD Special Bulletin Generator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+        }
+
+        .bulletin-container {
+            width: 800px;
+            background-color: #ffffff;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        /* --- HEADER SECTION --- */
+        .header {
+            background: linear-gradient(135deg, #052943, #294b62);
+            color: #ffffff;
+            padding: 15px 20px;
+            position: relative;
+            text-align: center;
+            border-bottom: 5px solid #cca12c;
+        }
+
+        .header-top {
+            font-family: 'Georgia', serif;
+            font-size: 26px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0px;
+            font-weight: normal;
+        }
+
+        .header-main {
+            font-family: 'Archivo Black', Arial, sans-serif;
+            font-size: 64px;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            line-height: 1;
+            margin: 5px 0;
+            transform: scaleY(1.1);
+        }
+
+        .header-bottom {
+            font-family: 'Georgia', serif;
+            font-size: 24px;
+            text-transform: uppercase;
+            text-align: right;
+            margin-right: 20px;
+            font-style: italic;
+        }
+
+        .badge-logo {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100px;
+            height: 100px;
+            background: no-repeat center/contain;
+        }
+
+        /* --- BANNER WANTED & CRIME --- */
+        .banner-wanted {
+            background-color: #dca71f;
+            color: #000000;
+            font-family: 'Archivo Black', Arial, sans-serif;
+            font-size: 52px;
+            text-align: center;
+            padding: 5px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .banner-crime {
+            background-color: #695443;
+            color: #ffffff;
+            font-family: 'Archivo Black', Arial, sans-serif;
+            font-size: 34px;
+            text-align: center;
+            padding: 8px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- SUSPECT INFO SECTION --- */
+        .suspect-container {
+            display: flex;
+            border: 2px solid #000000;
+            margin: 20px;
+            background-color: #ffffff;
+        }
+
+        .photo-box {
+            width: 240px;
+            height: 320px;
+            border-right: 2px solid #000000;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .photo-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-date {
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            background-color: #ffffff;
+            border: 1px solid #000000;
+            font-family: monospace;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 2px 4px;
+        }
+
+        .info-box {
+            flex: 1;
+            padding: 15px;
+            font-family: Arial, sans-serif;
+            font-size: 20px;
+            line-height: 1.5;
+            color: #000000;
+        }
+
+        .suspect-name {
+            font-size: 22px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .info-paragraph {
+            margin-bottom: 25px;
+        }
+
+        /* --- TEXT DETAILS SECTION --- */
+        .details-container {
+            padding: 0 25px;
+            font-size: 16px;
+            line-height: 1.4;
+            color: #000000;
+        }
+
+        .details-container p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .anonymous-tips {
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            margin: 30px 0;
+            padding: 0 10px;
+        }
+
+        .anonymous-tips a {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        /* --- FOOTER --- */
+        .footer {
+            background-color: #4b6143;
+            color: #ffffff;
+            text-align: center;
+            padding: 15px 20px;
+            font-family: Arial, sans-serif;
+            font-size: 18px;
+            font-weight: bold;
+            line-height: 1.4;
+        }
+
+        .footer .highlight {
+            color: #f3ca63;
+        }
+
+        /* --- EDITING MODE (модалка mrdcreator) --- */
+        body.mrd-editing [contenteditable="true"] {
+            outline: 1px dashed #cca12c;
+            outline-offset: 2px;
+            cursor: text;
+        }
+        body.mrd-editing [contenteditable="true"]:hover {
+            background: rgba(204,161,44,0.08);
+        }
+        body.mrd-editing .mrd-img-editable {
+            cursor: pointer;
+            position: relative;
+        }
+        body.mrd-editing .mrd-img-editable::after {
+            content: "\270E \043a\043b\0438\043a \0434\043b\044f \0441\043c\0435\043d\044b URL";
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            font-size: 11px;
+            text-align: center;
+            padding: 2px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bulletin-container">
+        
+        <!-- HEADER -->
+        <div class="header" id="mrd-header-image">
+            <div class="badge-logo" id="mrd-badge-logo"></div>
+            <div class="header-top" id="mrd-header-top">Los Santos County Sheriff's Department</div>
+            <div class="header-main" id="mrd-header-main">Special Bulletin</div>
+            <div class="header-bottom" id="mrd-header-bottom">Sheriff Ignacio Serrano</div>
+        </div>
+
+        <!-- WANTED BANNER -->
+        <div class="banner-wanted" id="mrd-banner-wanted">Wanted</div>
+
+        <!-- CRIME BANNER -->
+        <div class="banner-crime" id="mrd-banner-crime">Robbery - 211 P.C.</div>
+
+        <!-- SUSPECT DATA -->
+        <div class="suspect-container">
+            <!-- Photo 1 -->
+            <div class="photo-box">
+                <img id="mrd-photo-1" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNDAiIGhlaWdodD0iMzIwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRlM2U4Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM1YTY3NzIiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtZmF1bWlseT0iQXJpYWwiPlBob3RvIDE8L3RleHQ+PC9zdmc+" alt="Suspect Face">
+                <div class="photo-date" id="mrd-photo-date-1">PHOTO DATE: 01/27/2026</div>
+            </div>
+            
+            <!-- Photo 2 -->
+            <div class="photo-box">
+                <img id="mrd-photo-2" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNDAiIGhlaWdodD0iMzIwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRlM2U4Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM1YTY3NzIiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtZmFtaWx5PSJBcmlhbCI+UGhvdG8gMjwvdGV4dD48L3N2Zz4+" alt="Suspect Action">
+                <div class="photo-date" id="mrd-photo-date-2">PHOTO DATE: 03/17/2026</div>
+            </div>
+
+            <!-- Text Info -->
+            <div class="info-box">
+                <div class="suspect-name" id="mrd-suspect-name">IVEY, QUANDRELL</div>
+                
+                <div class="info-paragraph" id="mrd-info-1">
+                    Male, Black, 37 years old<br>
+                    5'11", 180 lbs., black hair, brown eyes
+                </div>
+
+                <div class="info-paragraph" id="mrd-info-2">
+                    Transient in the area of Hollywood, CA
+                </div>
+            </div>
+        </div>
+
+        <!-- DESCRIPTION AND DETAILS -->
+        <div class="details-container">
+            <p id="mrd-details-1">On Tuesday, March 17, 2026, at approximately 12:52 p.m., Suspect Ivey entered a business on the 200 block of South Atlantic Blvd., in East Los Santos and began removing food items from the display. S/Ivey bypassed the manned register and walked towards the door without attempting to pay for the items. The employee (victim) attempted to stop S/Ivey from exiting. S/Ivey pushed the victim, causing him to fall on the ground and hit his head, rendering him unconscious. S/Ivey fled the location on foot and out of view.</p>
+            
+            <p id="mrd-details-2">A warrant has been issued for his arrest. S/Ivey has an additional warrant for a Parole Violation.</p>
+            
+            <p id="mrd-details-3">If you have any information please contact the Detective X. Zeas or the on-duty Watch Commander at (323) 264-4151.</p>
+        </div>
+
+        <!-- ANONYMOUS TIPS -->
+        <div class="anonymous-tips" id="mrd-tips">
+            If you prefer to provide information anonymously, you may call "Crime Stoppers" by dialing (800) 222-TIPS (8477), use your smartphone by downloading the "P3 Tips" Mobile APP on Google play or the Apple App Store or by using the website <a href="http://lacrimestoppers.org" target="_blank">http://lacrimestoppers.org</a>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer" id="mrd-footer">
+            <span class="highlight">ANY INFORMATION PLEASE CONTACT:</span><br>
+            East Los Santos Sheriff's Station - Detective Bureau<br>
+            5019 E. 3rd Street, Los Santos, CA 90022<br>
+            (323) 264-4151 <span class="highlight">ATTENTION:</span> Detective X. Zeas
+        </div>
+
+    </div>
+
+</body>
+</html>
