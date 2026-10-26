@@ -119,7 +119,8 @@ document.addEventListener("DOMContentLoaded", function() {
     var val = function(id) {
         var el = document.getElementById(id);
         var value = (el && el.value.trim() !== '') ? el.value.trim() : 'Ответ писать здесь';
-        return value;
+        // Возвращаем текст, принудительно окрашенный в темно-серый/черный цвет для форума
+        return '[color=#1a2920]' + value + '[/color]';
     };
 
     // Для XenForo стандартно используются кастомные BB-коды [cbf]/[cb] или юникод чеклисты
@@ -171,12 +172,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
         var COL_LIGHT = '#f2f6f4';
         var COL_WHITE = '#ffffff';
-        var COL_DARK = '#2A4334';
-
-        var ACCENT = '#1f3326';
+        var ACCENT = '#1f3326';    // Темно-зеленый для заголовков
         var ACCENT2 = '#2d5a40';
         var ACCENT3 = '#3d5e4b';
-        var TEXT_MAIN = '#111827';
+        var TEXT_DARK = '#1a2920'; // Основной темный цвет текста
 
         // ШАПКА
         b += '[box=' + COL_LIGHT + '][list][float=right][img]https://i.imgur.com/1IZekQj.png[/img][/float][left][font=Arial][size=130][color=' + ACCENT + '][b]LOS SANTOS COUNTY SHERIFF\'S DEPARTMENT[/b][/color][/size]\n';
@@ -188,32 +187,32 @@ document.addEventListener("DOMContentLoaded", function() {
         b += '[center][size=120][color=' + ACCENT + '][b]CIVILIAN EMPLOYMENT APPLICATION[/b][/color][/size]\n';
         b += '[size=90][color=' + ACCENT2 + '][b]' + posTitle + '[/b][/color][/size][/center]\n';
         b += '[hr][/hr]\n';
-        b += '[coll][b]ЗАЯВИТЕЛЬ:[/b] [color=' + TEXT_MAIN + ']' + val('f_first') + ' ' + val('f_last') + '[/color]\n';
-        b += '[b]ДАТА ПОДАЧИ:[/b] [color=' + TEXT_MAIN + ']' + todayStr + '[/color]|[b]ТИП ДОЛЖНОСТИ:[/b] [color=' + TEXT_MAIN + ']' + posTitle + '[/color]\n';
+        b += '[coll][b]ЗАЯВИТЕЛЬ:[/b] [color=' + TEXT_DARK + ']' + first + ' ' + last + '[/color]\n';
+        b += '[b]ДАТА ПОДАЧИ:[/b] [color=' + TEXT_DARK + ']' + todayStr + '[/color]|[b]ТИП ДОЛЖНОСТИ:[/b] [color=' + TEXT_DARK + ']' + posTitle + '[/color]\n';
         b += '[b]СТАТУС:[/b] [color=' + ACCENT + '][b]НА РАССМОТРЕНИИ[/b][/color][/coll]\n';
         b += '[/list][/box]';
 
         // I. ЛИЧНАЯ ИНФОРМАЦИЯ
         b += '[box=' + COL_LIGHT + '][list]\n';
-        b += '[size=100][b]I. ЛИЧНАЯ ИНФОРМАЦИЯ[/b][/size]\n';
-        b += '[coll][b]Имя:[/b] ' + val('f_first') + '\n[b]Второе имя:[/b] ' + val('f_middle') + '|[b]Фамилия:[/b] ' + val('f_last') + '\n[b]Дата рождения:[/b] ' + val('f_dob_m') + '/' + val('f_dob_d') + '/' + val('f_dob_y') + '[/coll]\n';
+        b += '[size=100][color=' + ACCENT + '][b]I. ЛИЧНАЯ ИНФОРМАЦИЯ[/b][/color][/size]\n';
+        b += '[coll][b]Имя:[/b] ' + val('f_first') + '\n[b]Второе имя:[/b] ' + val('f_middle') + '|[b]Фамилия:[/b] ' + val('f_last') + '\n[b]Дата рождения:[/b] [color=' + TEXT_DARK + ']' + val('f_dob_m').replace(/\[color.*?\](.*?)\[\/color\]/, '$1') + '/' + val('f_dob_d').replace(/\[color.*?\](.*?)\[\/color\]/, '$1') + '/' + val('f_dob_y').replace(/\[color.*?\](.*?)\[\/color\]/, '$1') + '[/color][/coll]\n';
         b += '[coll][b]Место рождения:[/b] ' + val('f_birthplace') + '\n[b]Пол:[/b] ' + val('f_gender') + '|[b]Раса:[/b] ' + val('f_race') + '\n[b]Семейное положение:[/b] ' + val('f_marital') + '[/coll]\n';
         b += '[coll][b]Рост:[/b] ' + val('f_height') + ' футов\n[b]Вес:[/b] ' + val('f_weight') + ' фунтов|[b]Телефон:[/b] ' + val('f_phone') + '\n[b]Email:[/b] ' + val('f_email') + '[/coll]\n';
-        b += '[b]Адрес:[/b] ' + val('f_addr_street') + ', ' + val('f_addr_city') + ', ' + val('f_addr_state') + '\n';
+        b += '[b]Адрес:[/b] [color=' + TEXT_DARK + ']' + val('f_addr_street').replace(/\[color.*?\](.*?)\[\/color\]/, '$1') + ', ' + val('f_addr_city').replace(/\[color.*?\](.*?)\[\/color\]/, '$1') + ', ' + val('f_addr_state').replace(/\[color.*?\](.*?)\[\/color\]/, '$1') + '[/color]\n';
         b += '[/list][/box]';
 
         // II. ОБРАЗОВАНИЕ
         b += '[box=' + COL_WHITE + '][list]\n';
-        b += '[size=100][b]II. ОБРАЗОВАНИЕ[/b][/size]\n';
+        b += '[size=100][color=' + ACCENT + '][b]II. ОБРАЗОВАНИЕ[/b][/color][/size]\n';
         b += '[coll][b]Уровень образования:[/b] ' + val('f_edu_level') + '\n[b]Учебное заведение:[/b] ' + val('f_edu_name') + '|[b]Период обучения:[/b] ' + val('f_edu_period') + '\n[b]Специальность:[/b] ' + val('f_edu_major') + '[/coll]\n';
         b += '[/list][/box]';
 
         // III. ОПЫТ РАБОТЫ
         b += '[box=' + COL_LIGHT + '][list]\n';
-        b += '[size=100][b]III. ОПЫТ РАБОТЫ[/b][/size]\n';
+        b += '[size=100][color=' + ACCENT + '][b]III. ОПЫТ РАБОТЫ[/b][/color][/size]\n';
         for (var i = 1; i <= 3; i++) {
             var jt = i === 1 ? 'ПЕРВОЕ МЕСТО РАБОТЫ' : i === 2 ? 'ВТОРОЕ МЕСТО РАБОТЫ' : 'ТРЕТЬЕ МЕСТО РАБОТЫ';
-            b += '[b]' + jt + '[/b]\n';
+            b += '[b][color=' + ACCENT2 + ']' + jt + '[/color][/b]\n';
             b += '[coll][b]Компания:[/b] ' + val('f_job' + i + '_co') + '\n[b]Должность:[/b] ' + val('f_job' + i + '_pos') + '|[b]Период работы:[/b] ' + val('f_job' + i + '_period') + '\n[b]Причина увольнения:[/b] ' + val('f_job' + i + '_reason') + '[/coll]\n';
             b += '[justify][b]Обязанности:[/b] ' + val('f_job' + i + '_desc') + '[/justify]\n';
             if (i < 3) b += '[hr][/hr]\n';
@@ -222,7 +221,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // IV. ВОПРОСЫ ПРОВЕРКИ БИОГРАФИИ
         b += '[box=' + COL_WHITE + '][list]\n';
-        b += '[size=100][b]IV. ВОПРОСЫ ПРОВЕРКИ БИОГРАФИИ[/b][/size]\n';
+        b += '[size=100][color=' + ACCENT + '][b]IV. ВОПРОСЫ ПРОВЕРКИ БИОГРАФИИ[/b][/color][/size]\n';
         var qNum = 19;
 
         b += '[b]' + (qNum++) + '. Я имею действительное водительское удостоверение штата Сан-Андреас[/b]\n[list]\n' + radio(val('bg_license'), defaultYesNo) + '\n[/list]\n';
@@ -236,19 +235,19 @@ document.addEventListener("DOMContentLoaded", function() {
 
         var mVal = val('bg_military');
         b += '[b]' + (qNum++) + '. Я являюсь действующим или бывшим военнослужащим Вооруженных сил США[/b]\n[list]\n';
-        b += cb(mVal === 'Да, я прохожу службу в настоящее время') + ' Да, я прохожу службу в настоящее время\n[list]Род войск: ' + val('bg_mil_active') + '[/list]\n';
-        b += cb(mVal === 'Да, я проходил(а) службу ранее') + ' Да, я проходил(а) службу ранее\n[list]Род войск: ' + val('bg_mil_prev') + '[/list]\n';
-        b += cb(mVal === 'Нет') + ' Нет\n' + cb(mVal === 'Не знаю') + ' Не знаю\n' + cb(mVal === 'Не хочу отвечать') + ' Не хочу отвечать\n' + cb(mVal === 'Другое') + ' Другое\n[/list]\n';
+        b += cb(mVal.includes('Да, я прохожу службу в настоящее время')) + ' Да, я прохожу службу в настоящее время\n[list]Род войск: ' + val('bg_mil_active') + '[/list]\n';
+        b += cb(mVal.includes('Да, я проходил(а) службу ранее')) + ' Да, я проходил(а) службу ранее\n[list]Род войск: ' + val('bg_mil_prev') + '[/list]\n';
+        b += cb(mVal.includes('Нет')) + ' Нет\n' + cb(mVal.includes('Не знаю')) + ' Не знаю\n' + cb(mVal.includes('Не хочу отвечать')) + ' Не хочу отвечать\n' + cb(mVal.includes('Другое')) + ' Другое\n[/list]\n';
 
         b += '[b]' + (qNum++) + '. В настоящее время я нахожусь под уголовной пробацией или на условно-досрочном освобождении[/b]\n[list]\n' + radio(val('bg_probation'), defaultYesNo) + '\n[/list]\n';
 
         var duiVal = val('bg_dui');
-        b += '[b]' + (qNum++) + '. Я имею судимости за вождение в состоянии алкогольного или наркотического опьянения в Сан-Андреас и/или других штатах[/b]\n[list]\n';
-        b += cb(duiVal === 'Да') + ' Да\n[list]Укажите штат(ы) и год(ы) судимости: ' + val('bg_dui_detail') + '[/list]\n' + cb(duiVal === 'Нет') + ' Нет\n' + cb(duiVal === 'Не знаю') + ' Не знаю\n' + cb(duiVal === 'Не хочу отвечать') + ' Не хочу отвечать\n' + cb(duiVal === 'Другое') + ' Другое\n[/list]\n';
+        b += '[b]' + (qNum++) + '. Я имею судимости за вождение в состоянии алкогольного или наркотического опьянения в Сан-Андреас и/ili других штатах[/b]\n[list]\n';
+        b += cb(duiVal.includes('Да')) + ' Да\n[list]Укажите штат(ы) и год(ы) судимости: ' + val('bg_dui_detail') + '[/list]\n' + cb(duiVal.includes('Нет')) + ' Нет\n' + cb(duiVal.includes('Не знаю')) + ' Не знаю\n' + cb(duiVal.includes('Не хочу отвечать')) + ' Не хочу отвечать\n' + cb(duiVal.includes('Другое')) + ' Другое\n[/list]\n';
 
         var mjVal = val('bg_marijuana');
         b += '[b]' + (qNum++) + '. Я употреблял(а) марихуану в течение последнего года[/b]\n[list]\n';
-        b += cb(mjVal === 'Да') + ' Да\n[list]Укажите месяц(ы) и год(ы) употребления: ' + val('bg_marijuana_detail') + '[/list]\n' + cb(mjVal === 'Нет') + ' Нет\n' + cb(mjVal === 'Не знаю') + ' Не знаю\n' + cb(mjVal === 'Не хочу отвечать') + ' Не хочу отвечать\n' + cb(mjVal === 'Другое') + ' Другое\n[/list]\n';
+        b += cb(mjVal.includes('Да')) + ' Да\n[list]Укажите месяц(ы) и год(ы) употребления: ' + val('bg_marijuana_detail') + '[/list]\n' + cb(mjVal.includes('Нет')) + ' Нет\n' + cb(mjVal.includes('Не знаю')) + ' Не знаю\n' + cb(mjVal.includes('Не хочу отвечать')) + ' Не хочу отвечать\n' + cb(mjVal.includes('Другое')) + ' Другое\n[/list]\n';
 
         b += '[b]' + (qNum++) + '. Я употреблял(а) другие запрещенные вещества в течение последнего года[/b]\n[list]\n' + radio(val('bg_drugs'), defaultYesNo) + '\n[/list]\n';
         b += '[b]' + (qNum++) + '. Я совершал(а) кражу или хищение на сумму 950 долларов США или более[/b]\n[list]\n' + radio(val('bg_theft'), defaultYesNo) + '\n[/list]\n';
@@ -256,19 +255,19 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // V. ДЕКЛАРАЦИЯ И ПОДТВЕРЖДЕНИЕ
         b += '[box=' + COL_LIGHT + '][list]\n';
-        b += '[size=100][b]V. ДЕКЛАРАЦИЯ И ПОДТВЕРЖДЕНИЕ[/b][/size]\n';
+        b += '[size=100][color=' + ACCENT + '][b]V. ДЕКЛАРАЦИЯ И ПОДТВЕРЖДЕНИЕ[/b][/color][/size]\n';
         b += '[justify]Я, нижеподписавшийся(-аяся), настоящим подтверждаю под страхом наказания за лжесвидетельство, что вся вышеуказанная информация является точной и полной, насколько мне известно.[/justify]\n';
         b += '[b]Подпись:[/b] ' + val('decl_sign') + '\n';
-        b += '[b]Дата:[/b] ' + val('decl_dm') + '/' + val('decl_dd') + '/' + val('decl_dy') + '\n';
+        b += '[b]Дата:[/b] [color=' + TEXT_DARK + ']' + val('decl_dm').replace(/\[color.*?\](.*?)\[\/color\]/, '$1') + '/' + val('decl_dd').replace(/\[color.*?\](.*?)\[\/color\]/, '$1') + '/' + val('decl_dy').replace(/\[color.*?\](.*?)\[\/color\]/, '$1') + '[/color]\n';
         b += '[/list][/box]';
 
         // VI. OUT OF CHARACTER ВОПРОСЫ
         b += '[box=' + COL_WHITE + '][list]\n';
-        b += '[size=100][b]VI. OUT OF CHARACTER ВОПРОСЫ[/b][/size]\n';
+        b += '[size=100][color=' + ACCENT + '][b]VI. OUT OF CHARACTER ВОПРОСЫ[/b][/color][/size]\n';
 
         var oPrefix = (type && typeof type === 'string') ? type.toLowerCase() : 'cso';
         var tVal = val('ooc_' + oPrefix + '_banned');
-        var bStr = cb(tVal === 'Да') + ' Да\n[list]Пояснение: ' + val('ooc_' + oPrefix + '_banned_detail') + '[/list]\n' + cb(tVal === 'Нет') + ' Нет';
+        var bStr = cb(tVal.includes('Да')) + ' Да\n[list]Пояснение: ' + val('ooc_' + oPrefix + '_banned_detail') + '[/list]\n' + cb(tVal.includes('Нет')) + ' Нет';
 
         if (type === 'TOW' || type === 'ABP') {
             b += '[coll][b]Часовой пояс:[/b] ' + val('ooc_' + oPrefix + '_tz') + '\n[b]UCP:[/b] ' + val('ooc_' + oPrefix + '_ucp') + '|[b]Форум:[/b] ' + val('ooc_' + oPrefix + '_forum') + '\n[b]Дабл-фракция:[/b] ' + val('ooc_' + oPrefix + '_double') + '[/coll]\n';
@@ -289,12 +288,10 @@ document.addEventListener("DOMContentLoaded", function() {
         // ПОДВАЛ
         b += '[box=' + COL_DARK + '][center][size=80][color=#ffffff]LOS SANTOS COUNTY SHERIFF\'S DEPARTMENT / CIVILIAN MANAGEMENT BUREAU[/color][/size][/center][/box]';
 
-        // Вывод результатов в модальное окно
         document.getElementById('out_subject').value = generatedSubject;
         document.getElementById('out_bbcode').value = b;
         document.getElementById('resultModal').style.display = 'flex';
     });
-
     // Обработка кнопки копирования
     safeAddListener('copyBbcodeBtn', 'click', function() {
         var bbcodeArea = document.getElementById('out_bbcode');
