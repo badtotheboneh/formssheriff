@@ -116,7 +116,7 @@ document.addEventListener("DOMContentLoaded", function() {
         if (w) w.classList.toggle('visible', this.value === 'Да');
     });
 
-    // Функция получения чистого значения без тегов (чтобы логика проверок не ломалась)
+    // Функция получения чистого значения без тегов
     var val = function(id) {
         var el = document.getElementById(id);
         return (el && el.value.trim() !== '') ? el.value.trim() : 'Ответ писать здесь';
@@ -142,6 +142,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Генерация BBCode
     safeAddListener('civilianSubmitBtn', 'click', function() {
+        // Объявляем палитру цветов в самом начале функции, чтобы избежать ReferenceError
+        var COL_LIGHT = '#f2f6f4';
+        var COL_WHITE = '#ffffff';
+        var COL_DARK = '#2A4334';
+        var ACCENT = '#1f3326';
+        var ACCENT2 = '#2d5a40';
+        var ACCENT3 = '#3d5e4b';
+        var TEXT_DARK = '#1a2920';
+
         var typeEl = document.getElementById('final_app_type');
         if (!typeEl) return;
 
@@ -161,7 +170,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         var generatedSubject = '[' + type + '] ' + first + ' ' + last;
-
         var b = '';
 
         var posTitleMap = {
@@ -175,15 +183,8 @@ document.addEventListener("DOMContentLoaded", function() {
         var nowD = new Date();
         var todayStr = nowD.getDate() + ' ' + months[nowD.getMonth()] + ' ' + nowD.getFullYear();
 
-        var COL_LIGHT = '#f2f6f4';
-        var COL_WHITE = '#ffffff';
-        var ACCENT = '#1f3326';
-        var ACCENT2 = '#2d5a40';
-        var ACCENT3 = '#3d5e4b';
-        var TEXT_DARK = '#1a2920';
-
         // ШАПКА
-        b += '[box=' + COL_LIGHT + '][list][float=right][img]https://i.imgur.com/1IZekQj.png[/img][/float][left][font=Arial][size=130][color=' + ACCENT + '][b]LOS SANTOS COUNTY SHERIFF\'ْس DEPARTMENT[/b][/color][/size]\n';
+        b += '[box=' + COL_LIGHT + '][list][float=right][img]https://i.imgur.com/1IZekQj.png[/img][/float][left][font=Arial][size=130][color=' + ACCENT + '][b]LOS SANTOS COUNTY SHERIFF\'S DEPARTMENT[/b][/color][/size]\n';
         b += '[size=85][color=' + ACCENT2 + '][b]CIVILIAN MANAGEMENT BUREAU[/b][/color][/size]\n';
         b += '[size=85][color=' + ACCENT3 + '][b]CIVILIAN EMPLOYMENT APPLICATION[/b][/color][/size][/font][/left][/list][/box]';
 
