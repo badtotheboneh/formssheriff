@@ -189,24 +189,24 @@ document.addEventListener("DOMContentLoaded", function() {
         b += '[center][size=120][color=' + ACCENT + '][b]CIVILIAN EMPLOYMENT APPLICATION[/b][/color][/size]\n';
         b += '[size=90][color=' + ACCENT2 + '][b]' + posTitle + '[/b][/color][/size][/center]\n';
         b += '[hr][/hr]\n';
-        b += '[coll][b][color=' + TEXT_DARK + ']ЗАЯВИТЕЛЬ:[/color][/b] ' + cval('f_first') + ' ' + cval('f_last') + '\n';
+        b += '[b][color=' + TEXT_DARK + ']ЗАЯВИТЕЛЬ:[/color][/b] ' + cval('f_first') + ' ' + cval('f_last') + '\n';
         b += '[b][color=' + TEXT_DARK + ']ДАТА ПОДАЧИ:[/color][/b] [color=' + TEXT_DARK + ']' + todayStr + '[/color]|[b][color=' + TEXT_DARK + ']ТИП ДОЛЖНОСТИ:[/color][/b] [color=' + TEXT_DARK + ']' + posTitle + '[/color]\n';
-        b += '[b][color=' + TEXT_DARK + ']СТАТУС:[/color][/b] [color=' + ACCENT + '][b]НА РАССМОТРЕНИИ[/b][/color][/coll]\n';
+        b += '[b][color=' + TEXT_DARK + ']СТАТУС:[/color][/b] [color=' + ACCENT + '][b]НА РАССМОТРЕНИИ[/b][/color]\n';
         b += '[/box]';
 
         // I. ЛИЧНАЯ ИНФОРМАЦИЯ
         b += '[box=' + COL_LIGHT + ']\n';
         b += '[size=100][color=' + ACCENT + '][b]I. ЛИЧНАЯ ИНФОРМАЦИЯ[/b][/color][/size]\n';
-        b += '[coll][b][color=' + TEXT_DARK + ']Имя:[/color][/b] ' + cval('f_first') + '\n[b][color=' + TEXT_DARK + ']Второе имя:[/color][/b] ' + cval('f_middle') + '|[b][color=' + TEXT_DARK + ']Фамилия:[/color][/b] ' + cval('f_last') + '\n[b][color=' + TEXT_DARK + ']Дата рождения:[/color][/b] [color=' + TEXT_DARK + ']' + val('f_dob_m') + '/' + val('f_dob_d') + '/' + val('f_dob_y') + '[/color][/coll]\n';
-        b += '[coll][b][color=' + TEXT_DARK + ']Место рождения:[/color][/b] ' + cval('f_birthplace') + '\n[b][color=' + TEXT_DARK + ']Пол:[/color][/b] ' + cval('f_gender') + '|[b][color=' + TEXT_DARK + ']Раса:[/color][/b] ' + cval('f_race') + '\n[b][color=' + TEXT_DARK + ']Семейное положение:[/color][/b] ' + cval('f_marital') + '[/coll]\n';
-        b += '[coll][b][color=' + TEXT_DARK + ']Рост:[/color][/b] [color=' + TEXT_DARK + ']' + val('f_height') + ' футов[/color]\n[b][color=' + TEXT_DARK + ']Вес:[/color][/b] [color=' + TEXT_DARK + ']' + val('f_weight') + ' фунтов[/color]|[b][color=' + TEXT_DARK + ']Телефон:[/color][/b] ' + cval('f_phone') + '\n[b][color=' + TEXT_DARK + ']Email:[/color][/b] ' + cval('f_email') + '[/coll]\n';
+        b += '[b][color=' + TEXT_DARK + ']Имя:[/color][/b] ' + cval('f_first') + '\n[b][color=' + TEXT_DARK + ']Второе имя:[/color][/b] ' + cval('f_middle') + '|[b][color=' + TEXT_DARK + ']Фамилия:[/color][/b] ' + cval('f_last') + '\n[b][color=' + TEXT_DARK + ']Дата рождения:[/color][/b] [color=' + TEXT_DARK + ']' + val('f_dob_m') + '/' + val('f_dob_d') + '/' + val('f_dob_y') + '[/color]\n';
+        b += '[b][color=' + TEXT_DARK + ']Место рождения:[/color][/b] ' + cval('f_birthplace') + '\n[b][color=' + TEXT_DARK + ']Пол:[/color][/b] ' + cval('f_gender') + '|[b][color=' + TEXT_DARK + ']Раса:[/color][/b] ' + cval('f_race') + '\n[b][color=' + TEXT_DARK + ']Семейное положение:[/color][/b] ' + cval('f_marital') + '\n';
+        b += '[b][color=' + TEXT_DARK + ']Рост:[/color][/b] [color=' + TEXT_DARK + ']' + val('f_height') + ' футов[/color]\n[b][color=' + TEXT_DARK + ']Вес:[/color][/b] [color=' + TEXT_DARK + ']' + val('f_weight') + ' фунтов[/color]|[b][color=' + TEXT_DARK + ']Телефон:[/color][/b] ' + cval('f_phone') + '\n[b][color=' + TEXT_DARK + ']Email:[/color][/b] ' + cval('f_email') + '\n';
         b += '[b][color=' + TEXT_DARK + ']Адрес:[/color][/b] [color=' + TEXT_DARK + ']' + val('f_addr_street') + ', ' + val('f_addr_city') + ', ' + val('f_addr_state') + '[/color]\n';
         b += '[/box]';
 
         // II. ОБРАЗОВАНИЕ
         b += '[box=' + COL_WHITE + ']\n';
         b += '[size=100][color=' + ACCENT + '][b]II. ОБРАЗОВАНИЕ[/b][/color][/size]\n';
-        b += '[coll][b][color=' + TEXT_DARK + ']Уровень образования:[/color][/b] ' + cval('f_edu_level') + '\n[b][color=' + TEXT_DARK + ']Учебное заведение:[/color][/b] ' + cval('f_edu_name') + '|[b][color=' + TEXT_DARK + ']Период обучения:[/color][/b] ' + cval('f_edu_period') + '\n[b][color=' + TEXT_DARK + ']Специальность:[/color][/b] ' + cval('f_edu_major') + '[/coll]\n';
+        b += '[b][color=' + TEXT_DARK + ']Уровень образования:[/color][/b] ' + cval('f_edu_level') + '\n[b][color=' + TEXT_DARK + ']Учебное заведение:[/color][/b] ' + cval('f_edu_name') + '|[b][color=' + TEXT_DARK + ']Период обучения:[/color][/b] ' + cval('f_edu_period') + '\n[b][color=' + TEXT_DARK + ']Специальность:[/color][/b] ' + cval('f_edu_major') + '\n';
         b += '[/box]';
 
         // III. ОПЫТ РАБОТЫ
@@ -215,7 +215,7 @@ document.addEventListener("DOMContentLoaded", function() {
         for (var i = 1; i <= 3; i++) {
             var jt = i === 1 ? 'ПЕРВОЕ МЕСТО РАБОТЫ' : i === 2 ? 'ВТОРОЕ МЕСТО РАБОТЫ' : 'ТРЕТЬЕ МЕСТО РАБОТЫ';
             b += '[b][color=' + ACCENT2 + ']' + jt + '[/color][/b]\n';
-            b += '[coll][b][color=' + TEXT_DARK + ']Компания:[/color][/b] ' + cval('f_job' + i + '_co') + '\n[b][color=' + TEXT_DARK + ']Должность:[/color][/b] ' + cval('f_job' + i + '_pos') + '|[b][color=' + TEXT_DARK + ']Период работы:[/color][/b] ' + cval('f_job' + i + '_period') + '\n[b][color=' + TEXT_DARK + ']Причина увольнения:[/color][/b] ' + cval('f_job' + i + '_reason') + '[/coll]\n';
+            b += '[b][color=' + TEXT_DARK + ']Компания:[/color][/b] ' + cval('f_job' + i + '_co') + '\n[b][color=' + TEXT_DARK + ']Должность:[/color][/b] ' + cval('f_job' + i + '_pos') + '|[b][color=' + TEXT_DARK + ']Период работы:[/color][/b] ' + cval('f_job' + i + '_period') + '\n[b][color=' + TEXT_DARK + ']Причина увольнения:[/color][/b] ' + cval('f_job' + i + '_reason') + '\n';
             b += '[justify][b][color=' + TEXT_DARK + ']Обязанности:[/color][/b] ' + cval('f_job' + i + '_desc') + '[/justify]\n';
             if (i < 3) b += '[hr][/hr]\n';
         }
@@ -272,17 +272,17 @@ document.addEventListener("DOMContentLoaded", function() {
         var bStr = cb(tVal === 'Да') + ' [color=' + TEXT_DARK + ']Да[/color]\n[list][color=' + TEXT_DARK + ']Пояснение: ' + val('ooc_' + oPrefix + '_banned_detail') + '[/color][/list]\n' + cb(tVal === 'Нет') + ' [color=' + TEXT_DARK + ']Нет[/color]';
 
         if (type === 'TOW' || type === 'ABP') {
-            b += '[coll][b][color=' + TEXT_DARK + ']Часовой пояс:[/color][/b] ' + cval('ooc_' + oPrefix + '_tz') + '\n[b][color=' + TEXT_DARK + ']UCP:[/color][/b] ' + cval('ooc_' + oPrefix + '_ucp') + '|[b][color=' + TEXT_DARK + ']Форум:[/color][/b] ' + cval('ooc_' + oPrefix + '_forum') + '\n[b][color=' + TEXT_DARK + ']Дабл-фракция:[/color][/b] ' + cval('ooc_' + oPrefix + '_double') + '[/coll]\n';
+            b += '[b][color=' + TEXT_DARK + ']Часовой пояс:[/color][/b] ' + cval('ooc_' + oPrefix + '_tz') + '\n[b][color=' + TEXT_DARK + ']UCP:[/color][/b] ' + cval('ooc_' + oPrefix + '_ucp') + '|[b][color=' + TEXT_DARK + ']Форум:[/color][/b] ' + cval('ooc_' + oPrefix + '_forum') + '\n[b][color=' + TEXT_DARK + ']Дабл-фракция:[/color][/b] ' + cval('ooc_' + oPrefix + '_double') + '\n';
             b += '[b][color=' + TEXT_DARK + ']Скриншот истории наказаний из UCP:[/color][/b] ' + cval('ooc_' + oPrefix + '_punish') + '\n';
             b += '[b][color=' + TEXT_DARK + ']Исключали ли вас или банили в других официальных фракциях?[/color][/b]\n[list]\n' + bStr + '\n[/list]\n';
-            b += '[coll][b][color=' + TEXT_DARK + ']Согласие на отпечатки и фото (IC):[/color][/b] ' + radio(val('ooc_' + oPrefix + '_fp'), ['Да', 'Нет']).split('\n').join(' ') + '\n[b][color=' + TEXT_DARK + ']Рабочий микрофон / TS / Discord:[/b] ' + radio(val('ooc_' + oPrefix + '_mic'), ['Да', 'Нет']).split('\n').join(' ') + '|[b][color=' + TEXT_DARK + ']Прочитаны обязательные темы:[/color][/b] ' + radio(val('ooc_' + oPrefix + '_read'), ['Да', 'Нет']).split('\n').join(' ') + '\n[/coll]\n';
+            b += '[b][color=' + TEXT_DARK + ']Согласие на отпечатки и фото (IC):[/color][/b] ' + radio(val('ooc_' + oPrefix + '_fp'), ['Да', 'Нет']).split('\n').join(' ') + '\n[b][color=' + TEXT_DARK + ']Рабочий микрофон / TS / Discord:[/b] ' + radio(val('ooc_' + oPrefix + '_mic'), ['Да', 'Нет']).split('\n').join(' ') + '|[b][color=' + TEXT_DARK + ']Прочитаны обязательные темы:[/color][/b] ' + radio(val('ooc_' + oPrefix + '_read'), ['Да', 'Нет']).split('\n').join(' ') + '\n\n';
             b += '[b][color=' + TEXT_DARK + ']Представление персонажа:[/color][/b]\n[justify]' + cval('ooc_' + oPrefix + '_bio') + '[/justify]\n';
         } else {
-            b += '[coll][b][color=' + TEXT_DARK + ']Часовой пояс:[/color][/b] ' + cval('ooc_cso_tz') + '\n[b][color=' + TEXT_DARK + ']UCP:[/color][/b] ' + cval('ooc_cso_ucp') + '|[b][color=' + TEXT_DARK + ']Discord:[/color][/b] ' + cval('ooc_cso_discord') + '\n[b][color=' + TEXT_DARK + ']Дабл-фракция:[/color][/b] ' + cval('ooc_cso_double') + '[/coll]\n';
+            b += '[b][color=' + TEXT_DARK + ']Часовой пояс:[/color][/b] ' + cval('ooc_cso_tz') + '\n[b][color=' + TEXT_DARK + ']UCP:[/color][/b] ' + cval('ooc_cso_ucp') + '|[b][color=' + TEXT_DARK + ']Discord:[/color][/b] ' + cval('ooc_cso_discord') + '\n[b][color=' + TEXT_DARK + ']Дабл-фракция:[/color][/b] ' + cval('ooc_cso_double') + '\n';
             b += '[b][color=' + TEXT_DARK + ']Скриншот истории наказаний из UCP:[/color][/b] ' + cval('ooc_cso_punish') + '\n';
             b += '[b][color=' + TEXT_DARK + ']Профиль на форуме Gambit:[/color][/b] ' + cval('ooc_cso_gambit') + '\n';
             b += '[b][color=' + TEXT_DARK + ']Исключали ли вас или банили в других официальных фракциях?[/b]\n[list]\n' + bStr + '\n[/list]\n';
-            b += '[coll][b][color=' + TEXT_DARK + ']Согласие на отпечатки:[/color][/b] ' + radio(val('ooc_cso_fp'), ['Да', 'Нет']).split('\n').join(' ') + '\n[b][color=' + TEXT_DARK + ']Прочитаны обязательные темы:[/color][/b] ' + radio(val('ooc_cso_read'), ['Да', 'Нет']).split('\n').join(' ') + '[/coll]\n';
+            b += '[b][color=' + TEXT_DARK + ']Согласие на отпечатки:[/color][/b] ' + radio(val('ooc_cso_fp'), ['Да', 'Нет']).split('\n').join(' ') + '\n[b][color=' + TEXT_DARK + ']Прочитаны обязательные темы:[/color][/b] ' + radio(val('ooc_cso_read'), ['Да', 'Нет']).split('\n').join(' ') + '\n';
             b += '[b][color=' + TEXT_DARK + ']Представление персонажа:[/color][/b]\n[justify]' + cval('ooc_cso_bio') + '[/justify]\n';
         }
         b += '[/box]';
