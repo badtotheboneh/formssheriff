@@ -116,21 +116,26 @@ document.addEventListener("DOMContentLoaded", function() {
         if (w) w.classList.toggle('visible', this.value === 'Да');
     });
 
+    // Функция получения чистого значения без тегов (чтобы логика проверок не ломалась)
     var val = function(id) {
         var el = document.getElementById(id);
-        var value = (el && el.value.trim() !== '') ? el.value.trim() : 'Ответ писать здесь';
-        // Возвращаем текст, принудительно окрашенный в темно-серый/черный цвет для форума
-        return '[color=#1a2920]' + value + '[/color]';
+        return (el && el.value.trim() !== '') ? el.value.trim() : 'Ответ писать здесь';
     };
 
-    // Для XenForo стандартно используются кастомные BB-коды [cbf]/[cb] или юникод чеклисты
+    // Обертка для вывода ответов в темном цвете (#1a2920) на форуме
+    var cval = function(id) {
+        return '[color=#1a2920]' + val(id) + '[/color]';
+    };
+
+    // Чекбоксы форума
     var cb = function(isChecked) {
         return isChecked ? '[cbf][/cbf]' : '[cb][/cb]';
     };
 
     var radio = function(selVal, options) {
         return options.map(function(opt) {
-            return cb(opt === selVal) + ' ' + opt;
+            var formattedOpt = '[color=#1a2920]' + opt + '[/color]';
+            return cb(opt === selVal) + ' ' + formattedOpt;
         }).join('\n');
     };
     var defaultYesNo = ['Да', 'Нет', 'Не знаю', 'Не хочу отвечать', 'Другое'];
@@ -172,13 +177,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
         var COL_LIGHT = '#f2f6f4';
         var COL_WHITE = '#ffffff';
-        var ACCENT = '#1f3326';    // Темно-зеленый для заголовков
+        var ACCENT = '#1f3326';
         var ACCENT2 = '#2d5a40';
         var ACCENT3 = '#3d5e4b';
-        var TEXT_DARK = '#1a2920'; // Основной темный цвет текста
+        var TEXT_DARK = '#1a2920';
 
         // ШАПКА
-        b += '[box=' + COL_LIGHT + '][list][float=right][img]https://i.imgur.com/1IZekQj.png[/img][/float][left][font=Arial][size=130][color=' + ACCENT + '][b]LOS SANTOS COUNTY SHERIFF\'S DEPARTMENT[/b][/color][/size]\n';
+        b += '[box=' + COL_LIGHT + '][list][float=right][img]https://i.imgur.com/1IZekQj.png[/img][/float][left][font=Arial][size=130][color=' + ACCENT + '][b]LOS SANTOS COUNTY SHERIFF\'ْس DEPARTMENT[/b][/color][/size]\n';
         b += '[size=85][color=' + ACCENT2 + '][b]CIVILIAN MANAGEMENT BUREAU[/b][/color][/size]\n';
         b += '[size=85][color=' + ACCENT3 + '][b]CIVILIAN EMPLOYMENT APPLICATION[/b][/color][/size][/font][/left][/list][/box]';
 
@@ -195,16 +200,16 @@ document.addEventListener("DOMContentLoaded", function() {
         // I. ЛИЧНАЯ ИНФОРМАЦИЯ
         b += '[box=' + COL_LIGHT + '][list]\n';
         b += '[size=100][color=' + ACCENT + '][b]I. ЛИЧНАЯ ИНФОРМАЦИЯ[/b][/color][/size]\n';
-        b += '[coll][b]Имя:[/b] ' + val('f_first') + '\n[b]Второе имя:[/b] ' + val('f_middle') + '|[b]Фамилия:[/b] ' + val('f_last') + '\n[b]Дата рождения:[/b] [color=' + TEXT_DARK + ']' + val('f_dob_m').replace(/\[color.*?\](.*?)\[\/color\]/, '$1') + '/' + val('f_dob_d').replace(/\[color.*?\](.*?)\[\/color\]/, '$1') + '/' + val('f_dob_y').replace(/\[color.*?\](.*?)\[\/color\]/, '$1') + '[/color][/coll]\n';
-        b += '[coll][b]Место рождения:[/b] ' + val('f_birthplace') + '\n[b]Пол:[/b] ' + val('f_gender') + '|[b]Раса:[/b] ' + val('f_race') + '\n[b]Семейное положение:[/b] ' + val('f_marital') + '[/coll]\n';
-        b += '[coll][b]Рост:[/b] ' + val('f_height') + ' футов\n[b]Вес:[/b] ' + val('f_weight') + ' фунтов|[b]Телефон:[/b] ' + val('f_phone') + '\n[b]Email:[/b] ' + val('f_email') + '[/coll]\n';
-        b += '[b]Адрес:[/b] [color=' + TEXT_DARK + ']' + val('f_addr_street').replace(/\[color.*?\](.*?)\[\/color\]/, '$1') + ', ' + val('f_addr_city').replace(/\[color.*?\](.*?)\[\/color\]/, '$1') + ', ' + val('f_addr_state').replace(/\[color.*?\](.*?)\[\/color\]/, '$1') + '[/color]\n';
+        b += '[coll][b]Имя:[/b] ' + cval('f_first') + '\n[b]Второе имя:[/b] ' + cval('f_middle') + '|[b]Фамилия:[/b] ' + cval('f_last') + '\n[b]Дата рождения:[/b] [color=' + TEXT_DARK + ']' + val('f_dob_m') + '/' + val('f_dob_d') + '/' + val('f_dob_y') + '[/color][/coll]\n';
+        b += '[coll][b]Место рождения:[/b] ' + cval('f_birthplace') + '\n[b]Пол:[/b] ' + cval('f_gender') + '|[b]Раса:[/b] ' + cval('f_race') + '\n[b]Семейное положение:[/b] ' + cval('f_marital') + '[/coll]\n';
+        b += '[coll][b]Рост:[/b] [color=' + TEXT_DARK + ']' + val('f_height') + ' футов[/color]\n[b]Вес:[/b] [color=' + TEXT_DARK + ']' + val('f_weight') + ' фунтов[/color]|[b]Телефон:[/b] ' + cval('f_phone') + '\n[b]Email:[/b] ' + cval('f_email') + '[/coll]\n';
+        b += '[b]Адрес:[/b] [color=' + TEXT_DARK + ']' + val('f_addr_street') + ', ' + val('f_addr_city') + ', ' + val('f_addr_state') + '[/color]\n';
         b += '[/list][/box]';
 
         // II. ОБРАЗОВАНИЕ
         b += '[box=' + COL_WHITE + '][list]\n';
         b += '[size=100][color=' + ACCENT + '][b]II. ОБРАЗОВАНИЕ[/b][/color][/size]\n';
-        b += '[coll][b]Уровень образования:[/b] ' + val('f_edu_level') + '\n[b]Учебное заведение:[/b] ' + val('f_edu_name') + '|[b]Период обучения:[/b] ' + val('f_edu_period') + '\n[b]Специальность:[/b] ' + val('f_edu_major') + '[/coll]\n';
+        b += '[coll][b]Уровень образования:[/b] ' + cval('f_edu_level') + '\n[b]Учебное заведение:[/b] ' + cval('f_edu_name') + '|[b]Период обучения:[/b] ' + cval('f_edu_period') + '\n[b]Специальность:[/b] ' + cval('f_edu_major') + '[/coll]\n';
         b += '[/list][/box]';
 
         // III. ОПЫТ РАБОТЫ
@@ -213,8 +218,8 @@ document.addEventListener("DOMContentLoaded", function() {
         for (var i = 1; i <= 3; i++) {
             var jt = i === 1 ? 'ПЕРВОЕ МЕСТО РАБОТЫ' : i === 2 ? 'ВТОРОЕ МЕСТО РАБОТЫ' : 'ТРЕТЬЕ МЕСТО РАБОТЫ';
             b += '[b][color=' + ACCENT2 + ']' + jt + '[/color][/b]\n';
-            b += '[coll][b]Компания:[/b] ' + val('f_job' + i + '_co') + '\n[b]Должность:[/b] ' + val('f_job' + i + '_pos') + '|[b]Период работы:[/b] ' + val('f_job' + i + '_period') + '\n[b]Причина увольнения:[/b] ' + val('f_job' + i + '_reason') + '[/coll]\n';
-            b += '[justify][b]Обязанности:[/b] ' + val('f_job' + i + '_desc') + '[/justify]\n';
+            b += '[coll][b]Компания:[/b] ' + cval('f_job' + i + '_co') + '\n[b]Должность:[/b] ' + cval('f_job' + i + '_pos') + '|[b]Период работы:[/b] ' + cval('f_job' + i + '_period') + '\n[b]Причина увольнения:[/b] ' + cval('f_job' + i + '_reason') + '[/coll]\n';
+            b += '[justify][b]Обязанности:[/b] ' + cval('f_job' + i + '_desc') + '[/justify]\n';
             if (i < 3) b += '[hr][/hr]\n';
         }
         b += '[/list][/box]';
@@ -230,24 +235,24 @@ document.addEventListener("DOMContentLoaded", function() {
 
         b += '[b]' + (qNum++) + '. Я имею законное право на работу в Соединенных Штатах Америки[/b]\n[list]\n' + radio(val('bg_work'), defaultYesNo) + '\n[/list]\n';
         b += '[b]' + (qNum++) + '. Я узнал(а) о данной вакансии через[/b]\n[list]\n' + radio(val('bg_source'), ['Веб-сайт LSSD', 'Сайт станции шерифа', 'Социальные сети', 'Кампус университета', 'Ярмарку вакансий или семинар', 'Сотрудника LSSD', 'Сотрудника округа Лос-Сантос', 'Члена семьи', 'Друзей или соседей', 'Радио', 'Рекламный щит', 'Другое']) + '\n[/list]\n';
-        b += '[b]' + (qNum++) + '. Помимо английского, я владею следующими языками[/b]\n[list]' + val('bg_languages') + '[/list]\n';
+        b += '[b]' + (qNum++) + '. Помимо английского, я владею следующими языками[/b]\n[list]' + cval('bg_languages') + '[/list]\n';
         b += '[b]' + (qNum++) + '. Я являюсь лицом с ограниченными возможностями[/b]\n[list]\n' + radio(val('bg_disability'), defaultYesNo) + '\n[/list]\n';
 
         var mVal = val('bg_military');
         b += '[b]' + (qNum++) + '. Я являюсь действующим или бывшим военнослужащим Вооруженных сил США[/b]\n[list]\n';
-        b += cb(mVal.includes('Да, я прохожу службу в настоящее время')) + ' Да, я прохожу службу в настоящее время\n[list]Род войск: ' + val('bg_mil_active') + '[/list]\n';
-        b += cb(mVal.includes('Да, я проходил(а) службу ранее')) + ' Да, я проходил(а) службу ранее\n[list]Род войск: ' + val('bg_mil_prev') + '[/list]\n';
-        b += cb(mVal.includes('Нет')) + ' Нет\n' + cb(mVal.includes('Не знаю')) + ' Не знаю\n' + cb(mVal.includes('Не хочу отвечать')) + ' Не хочу отвечать\n' + cb(mVal.includes('Другое')) + ' Другое\n[/list]\n';
+        b += cb(mVal === 'Да, я прохожу службу в настоящее время') + ' [color=' + TEXT_DARK + ']Да, я прохожу службу в настоящее время[/color]\n[list]Род войск: ' + cval('bg_mil_active') + '[/list]\n';
+        b += cb(mVal === 'Да, я проходил(а) службу ранее') + ' [color=' + TEXT_DARK + ']Да, я проходил(а) службу ранее[/color]\n[list]Род войск: ' + cval('bg_mil_prev') + '[/list]\n';
+        b += cb(mVal === 'Нет') + ' [color=' + TEXT_DARK + ']Нет[/color]\n' + cb(mVal === 'Не знаю') + ' [color=' + TEXT_DARK + ']Не знаю[/color]\n' + cb(mVal === 'Не хочу отвечать') + ' [color=' + TEXT_DARK + ']Не хочу отвечать[/color]\n' + cb(mVal === 'Другое') + ' [color=' + TEXT_DARK + ']Другое[/color]\n[/list]\n';
 
         b += '[b]' + (qNum++) + '. В настоящее время я нахожусь под уголовной пробацией или на условно-досрочном освобождении[/b]\n[list]\n' + radio(val('bg_probation'), defaultYesNo) + '\n[/list]\n';
 
         var duiVal = val('bg_dui');
-        b += '[b]' + (qNum++) + '. Я имею судимости за вождение в состоянии алкогольного или наркотического опьянения в Сан-Андреас и/ili других штатах[/b]\n[list]\n';
-        b += cb(duiVal.includes('Да')) + ' Да\n[list]Укажите штат(ы) и год(ы) судимости: ' + val('bg_dui_detail') + '[/list]\n' + cb(duiVal.includes('Нет')) + ' Нет\n' + cb(duiVal.includes('Не знаю')) + ' Не знаю\n' + cb(duiVal.includes('Не хочу отвечать')) + ' Не хочу отвечать\n' + cb(duiVal.includes('Другое')) + ' Другое\n[/list]\n';
+        b += '[b]' + (qNum++) + '. Я имею судимости за вождение в состоянии алкогольного или наркотического опьянения в Сан-Андреас и/или других штатах[/b]\n[list]\n';
+        b += cb(duiVal === 'Да') + ' [color=' + TEXT_DARK + ']Да[/color]\n[list]Укажите штат(ы) и год(ы) судимости: ' + cval('bg_dui_detail') + '[/list]\n' + cb(duiVal === 'Нет') + ' [color=' + TEXT_DARK + ']Нет[/color]\n' + cb(duiVal === 'Не знаю') + ' [color=' + TEXT_DARK + ']Не знаю[/color]\n' + cb(duiVal === 'Не хочу отвечать') + ' [color=' + TEXT_DARK + ']Не хочу отвечать[/color]\n' + cb(duiVal === 'Другое') + ' [color=' + TEXT_DARK + ']Другое[/color]\n[/list]\n';
 
         var mjVal = val('bg_marijuana');
         b += '[b]' + (qNum++) + '. Я употреблял(а) марихуану в течение последнего года[/b]\n[list]\n';
-        b += cb(mjVal.includes('Да')) + ' Да\n[list]Укажите месяц(ы) и год(ы) употребления: ' + val('bg_marijuana_detail') + '[/list]\n' + cb(mjVal.includes('Нет')) + ' Нет\n' + cb(mjVal.includes('Не знаю')) + ' Не знаю\n' + cb(mjVal.includes('Не хочу отвечать')) + ' Не хочу отвечать\n' + cb(mjVal.includes('Другое')) + ' Другое\n[/list]\n';
+        b += cb(mjVal === 'Да') + ' [color=' + TEXT_DARK + ']Да[/color]\n[list]Укажите месяц(ы) и год(ы) употребления: ' + cval('bg_marijuana_detail') + '[/list]\n' + cb(mjVal === 'Нет') + ' [color=' + TEXT_DARK + ']Нет[/color]\n' + cb(mjVal === 'Не знаю') + ' [color=' + TEXT_DARK + ']Не знаю[/color]\n' + cb(mjVal === 'Не хочу отвечать') + ' [color=' + TEXT_DARK + ']Не хочу отвечать[/color]\n' + cb(mjVal === 'Другое') + ' [color=' + TEXT_DARK + ']Другое[/color]\n[/list]\n';
 
         b += '[b]' + (qNum++) + '. Я употреблял(а) другие запрещенные вещества в течение последнего года[/b]\n[list]\n' + radio(val('bg_drugs'), defaultYesNo) + '\n[/list]\n';
         b += '[b]' + (qNum++) + '. Я совершал(а) кражу или хищение на сумму 950 долларов США или более[/b]\n[list]\n' + radio(val('bg_theft'), defaultYesNo) + '\n[/list]\n';
@@ -257,8 +262,8 @@ document.addEventListener("DOMContentLoaded", function() {
         b += '[box=' + COL_LIGHT + '][list]\n';
         b += '[size=100][color=' + ACCENT + '][b]V. ДЕКЛАРАЦИЯ И ПОДТВЕРЖДЕНИЕ[/b][/color][/size]\n';
         b += '[justify]Я, нижеподписавшийся(-аяся), настоящим подтверждаю под страхом наказания за лжесвидетельство, что вся вышеуказанная информация является точной и полной, насколько мне известно.[/justify]\n';
-        b += '[b]Подпись:[/b] ' + val('decl_sign') + '\n';
-        b += '[b]Дата:[/b] [color=' + TEXT_DARK + ']' + val('decl_dm').replace(/\[color.*?\](.*?)\[\/color\]/, '$1') + '/' + val('decl_dd').replace(/\[color.*?\](.*?)\[\/color\]/, '$1') + '/' + val('decl_dy').replace(/\[color.*?\](.*?)\[\/color\]/, '$1') + '[/color]\n';
+        b += '[b]Подпись:[/b] ' + cval('decl_sign') + '\n';
+        b += '[b]Дата:[/b] [color=' + TEXT_DARK + ']' + val('decl_dm') + '/' + val('decl_dd') + '/' + val('decl_dy') + '[/color]\n';
         b += '[/list][/box]';
 
         // VI. OUT OF CHARACTER ВОПРОСЫ
@@ -267,21 +272,21 @@ document.addEventListener("DOMContentLoaded", function() {
 
         var oPrefix = (type && typeof type === 'string') ? type.toLowerCase() : 'cso';
         var tVal = val('ooc_' + oPrefix + '_banned');
-        var bStr = cb(tVal.includes('Да')) + ' Да\n[list]Пояснение: ' + val('ooc_' + oPrefix + '_banned_detail') + '[/list]\n' + cb(tVal.includes('Нет')) + ' Нет';
+        var bStr = cb(tVal === 'Да') + ' [color=' + TEXT_DARK + ']Да[/color]\n[list]Пояснение: ' + cval('ooc_' + oPrefix + '_banned_detail') + '[/list]\n' + cb(tVal === 'Нет') + ' [color=' + TEXT_DARK + ']Нет[/color]';
 
         if (type === 'TOW' || type === 'ABP') {
-            b += '[coll][b]Часовой пояс:[/b] ' + val('ooc_' + oPrefix + '_tz') + '\n[b]UCP:[/b] ' + val('ooc_' + oPrefix + '_ucp') + '|[b]Форум:[/b] ' + val('ooc_' + oPrefix + '_forum') + '\n[b]Дабл-фракция:[/b] ' + val('ooc_' + oPrefix + '_double') + '[/coll]\n';
-            b += '[b]Скриншот истории наказаний из UCP:[/b] ' + val('ooc_' + oPrefix + '_punish') + '\n';
+            b += '[coll][b]Часовой пояс:[/b] ' + cval('ooc_' + oPrefix + '_tz') + '\n[b]UCP:[/b] ' + cval('ooc_' + oPrefix + '_ucp') + '|[b]Форум:[/b] ' + cval('ooc_' + oPrefix + '_forum') + '\n[b]Дабл-фракция:[/b] ' + cval('ooc_' + oPrefix + '_double') + '[/coll]\n';
+            b += '[b]Скриншот истории наказаний из UCP:[/b] ' + cval('ooc_' + oPrefix + '_punish') + '\n';
             b += '[b]Исключали ли вас или банили в других официальных фракциях?[/b]\n[list]\n' + bStr + '\n[/list]\n';
             b += '[coll][b]Согласие на отпечатки и фото (IC):[/b] ' + radio(val('ooc_' + oPrefix + '_fp'), ['Да', 'Нет']).split('\n').join(' ') + '\n[b]Рабочий микрофон / TS / Discord:[/b] ' + radio(val('ooc_' + oPrefix + '_mic'), ['Да', 'Нет']).split('\n').join(' ') + '|[b]Прочитаны обязательные темы:[/b] ' + radio(val('ooc_' + oPrefix + '_read'), ['Да', 'Нет']).split('\n').join(' ') + '\n[/coll]\n';
-            b += '[b]Представление персонажа:[/b]\n[justify]' + val('ooc_' + oPrefix + '_bio') + '[/justify]\n';
+            b += '[b]Представление персонажа:[/b]\n[justify]' + cval('ooc_' + oPrefix + '_bio') + '[/justify]\n';
         } else {
-            b += '[coll][b]Часовой пояс:[/b] ' + val('ooc_cso_tz') + '\n[b]UCP:[/b] ' + val('ooc_cso_ucp') + '|[b]Discord:[/b] ' + val('ooc_cso_discord') + '\n[b]Дабл-фракция:[/b] ' + val('ooc_cso_double') + '[/coll]\n';
-            b += '[b]Скриншот истории наказаний из UCP:[/b] ' + val('ooc_cso_punish') + '\n';
-            b += '[b]Профиль на форуме Gambit:[/b] ' + val('ooc_cso_gambit') + '\n';
+            b += '[coll][b]Часовой пояс:[/b] ' + cval('ooc_cso_tz') + '\n[b]UCP:[/b] ' + cval('ooc_cso_ucp') + '|[b]Discord:[/b] ' + cval('ooc_cso_discord') + '\n[b]Дабл-фракция:[/b] ' + cval('ooc_cso_double') + '[/coll]\n';
+            b += '[b]Скриншот истории наказаний из UCP:[/b] ' + cval('ooc_cso_punish') + '\n';
+            b += '[b]Профиль на форуме Gambit:[/b] ' + cval('ooc_cso_gambit') + '\n';
             b += '[b]Исключали ли вас или банили в других официальных фракциях?[/b]\n[list]\n' + bStr + '\n[/list]\n';
             b += '[coll][b]Согласие на отпечатки:[/b] ' + radio(val('ooc_cso_fp'), ['Да', 'Нет']).split('\n').join(' ') + '\n[b]Прочитаны обязательные темы:[/b] ' + radio(val('ooc_cso_read'), ['Да', 'Нет']).split('\n').join(' ') + '[/coll]\n';
-            b += '[b]Представление персонажа:[/b]\n[justify]' + val('ooc_cso_bio') + '[/justify]\n';
+            b += '[b]Представление персонажа:[/b]\n[justify]' + cval('ooc_cso_bio') + '[/justify]\n';
         }
         b += '[/list][/box]';
 
@@ -292,6 +297,7 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById('out_bbcode').value = b;
         document.getElementById('resultModal').style.display = 'flex';
     });
+
     // Обработка кнопки копирования
     safeAddListener('copyBbcodeBtn', 'click', function() {
         var bbcodeArea = document.getElementById('out_bbcode');
