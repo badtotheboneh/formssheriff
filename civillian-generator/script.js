@@ -169,12 +169,14 @@ document.addEventListener("DOMContentLoaded", function() {
         var nowD = new Date();
         var todayStr = nowD.getDate() + ' ' + months[nowD.getMonth()] + ' ' + nowD.getFullYear();
 
-        var COL_LIGHT = '#f6f9f7';
+        var COL_LIGHT = '#f2f6f4';
         var COL_WHITE = '#ffffff';
-        var COL_DARK = '#2c4a3b';
-        var ACCENT = '#5f7d6d';
-        var ACCENT2 = '#93a89c';
-        var ACCENT3 = '#7a9384';
+        var COL_DARK = '#2A4334';
+
+        var ACCENT = '#1f3326';
+        var ACCENT2 = '#2d5a40';
+        var ACCENT3 = '#3d5e4b';
+        var TEXT_MAIN = '#111827';
 
         // ШАПКА
         b += '[box=' + COL_LIGHT + '][list][float=right][img]https://i.imgur.com/1IZekQj.png[/img][/float][left][font=Arial][size=130][b]LOS SANTOS COUNTY SHERIFF\'S DEPARTMENT[/b][/size]\n';
