@@ -179,38 +179,38 @@ document.addEventListener("DOMContentLoaded", function() {
         var nowD = new Date();
         var todayStr = nowD.getDate() + ' ' + months[nowD.getMonth()] + ' ' + nowD.getFullYear();
 
-        // ШАПКА (исправлено выравнивание через таблицы/флоаты без смещения)
-        b += '[box=' + COL_LIGHT + '][list][float=right][img=60]https://i.imgur.com/1IZekQj.png[/img][/float][font=Arial][size=130][color=' + ACCENT + '][b]LOS SANTOS COUNTY SHERIFF\'S DEPARTMENT[/b][/color][/size]\n';
+        // ШАПКА (убран лишний [list], заменен [img=60] на [img])[cite: 3]
+        b += '[box=' + COL_LIGHT + '][float=right][img]https://i.imgur.com/1IZekQj.png[/img][/float][font=Arial][size=130][color=' + ACCENT + '][b]LOS SANTOS COUNTY SHERIFF\'S DEPARTMENT[/b][/color][/size]\n';
         b += '[size=85][color=' + ACCENT2 + '][b]CIVILIAN MANAGEMENT BUREAU[/b][/color][/size]\n';
-        b += '[size=85][color=' + ACCENT3 + '][b]CIVILIAN EMPLOYMENT APPLICATION[/b][/color][/size][/font][/list][/box]';
+        b += '[size=85][color=' + ACCENT3 + '][b]CIVILIAN EMPLOYMENT APPLICATION[/b][/color][/size][/font][/box]';
 
         // ТИТУЛЬНЫЙ БЛОК
-        b += '[box=' + COL_WHITE + '][list]\n';
+        b += '[box=' + COL_WHITE + ']\n';
         b += '[center][size=120][color=' + ACCENT + '][b]CIVILIAN EMPLOYMENT APPLICATION[/b][/color][/size]\n';
         b += '[size=90][color=' + ACCENT2 + '][b]' + posTitle + '[/b][/color][/size][/center]\n';
         b += '[hr][/hr]\n';
         b += '[coll][b][color=' + TEXT_DARK + ']ЗАЯВИТЕЛЬ:[/color][/b] ' + cval('f_first') + ' ' + cval('f_last') + '\n';
         b += '[b][color=' + TEXT_DARK + ']ДАТА ПОДАЧИ:[/color][/b] [color=' + TEXT_DARK + ']' + todayStr + '[/color]|[b][color=' + TEXT_DARK + ']ТИП ДОЛЖНОСТИ:[/color][/b] [color=' + TEXT_DARK + ']' + posTitle + '[/color]\n';
         b += '[b][color=' + TEXT_DARK + ']СТАТУС:[/color][/b] [color=' + ACCENT + '][b]НА РАССМОТРЕНИИ[/b][/color][/coll]\n';
-        b += '[/list][/box]';
+        b += '[/box]';
 
         // I. ЛИЧНАЯ ИНФОРМАЦИЯ
-        b += '[box=' + COL_LIGHT + '][list]\n';
+        b += '[box=' + COL_LIGHT + ']\n';
         b += '[size=100][color=' + ACCENT + '][b]I. ЛИЧНАЯ ИНФОРМАЦИЯ[/b][/color][/size]\n';
         b += '[coll][b][color=' + TEXT_DARK + ']Имя:[/color][/b] ' + cval('f_first') + '\n[b][color=' + TEXT_DARK + ']Второе имя:[/color][/b] ' + cval('f_middle') + '|[b][color=' + TEXT_DARK + ']Фамилия:[/color][/b] ' + cval('f_last') + '\n[b][color=' + TEXT_DARK + ']Дата рождения:[/color][/b] [color=' + TEXT_DARK + ']' + val('f_dob_m') + '/' + val('f_dob_d') + '/' + val('f_dob_y') + '[/color][/coll]\n';
         b += '[coll][b][color=' + TEXT_DARK + ']Место рождения:[/color][/b] ' + cval('f_birthplace') + '\n[b][color=' + TEXT_DARK + ']Пол:[/color][/b] ' + cval('f_gender') + '|[b][color=' + TEXT_DARK + ']Раса:[/color][/b] ' + cval('f_race') + '\n[b][color=' + TEXT_DARK + ']Семейное положение:[/color][/b] ' + cval('f_marital') + '[/coll]\n';
         b += '[coll][b][color=' + TEXT_DARK + ']Рост:[/color][/b] [color=' + TEXT_DARK + ']' + val('f_height') + ' футов[/color]\n[b][color=' + TEXT_DARK + ']Вес:[/color][/b] [color=' + TEXT_DARK + ']' + val('f_weight') + ' фунтов[/color]|[b][color=' + TEXT_DARK + ']Телефон:[/color][/b] ' + cval('f_phone') + '\n[b][color=' + TEXT_DARK + ']Email:[/color][/b] ' + cval('f_email') + '[/coll]\n';
         b += '[b][color=' + TEXT_DARK + ']Адрес:[/color][/b] [color=' + TEXT_DARK + ']' + val('f_addr_street') + ', ' + val('f_addr_city') + ', ' + val('f_addr_state') + '[/color]\n';
-        b += '[/list][/box]';
+        b += '[/box]';
 
         // II. ОБРАЗОВАНИЕ
-        b += '[box=' + COL_WHITE + '][list]\n';
+        b += '[box=' + COL_WHITE + ']\n';
         b += '[size=100][color=' + ACCENT + '][b]II. ОБРАЗОВАНИЕ[/b][/color][/size]\n';
         b += '[coll][b][color=' + TEXT_DARK + ']Уровень образования:[/color][/b] ' + cval('f_edu_level') + '\n[b][color=' + TEXT_DARK + ']Учебное заведение:[/color][/b] ' + cval('f_edu_name') + '|[b][color=' + TEXT_DARK + ']Период обучения:[/color][/b] ' + cval('f_edu_period') + '\n[b][color=' + TEXT_DARK + ']Специальность:[/color][/b] ' + cval('f_edu_major') + '[/coll]\n';
-        b += '[/list][/box]';
+        b += '[/box]';
 
         // III. ОПЫТ РАБОТЫ
-        b += '[box=' + COL_LIGHT + '][list]\n';
+        b += '[box=' + COL_LIGHT + ']\n';
         b += '[size=100][color=' + ACCENT + '][b]III. ОПЫТ РАБОТЫ[/b][/color][/size]\n';
         for (var i = 1; i <= 3; i++) {
             var jt = i === 1 ? 'ПЕРВОЕ МЕСТО РАБОТЫ' : i === 2 ? 'ВТОРОЕ МЕСТО РАБОТЫ' : 'ТРЕТЬЕ МЕСТО РАБОТЫ';
@@ -219,10 +219,10 @@ document.addEventListener("DOMContentLoaded", function() {
             b += '[justify][b][color=' + TEXT_DARK + ']Обязанности:[/color][/b] ' + cval('f_job' + i + '_desc') + '[/justify]\n';
             if (i < 3) b += '[hr][/hr]\n';
         }
-        b += '[/list][/box]';
+        b += '[/box]';
 
         // IV. ВОПРОСЫ ПРОВЕРКИ БИОГРАФИИ
-        b += '[box=' + COL_WHITE + '][list]\n';
+        b += '[box=' + COL_WHITE + ']\n';
         b += '[size=100][color=' + ACCENT + '][b]IV. ВОПРОСЫ ПРОВЕРКИ БИОГРАФИИ[/b][/color][/size]\n';
         var qNum = 19;
 
@@ -253,18 +253,18 @@ document.addEventListener("DOMContentLoaded", function() {
 
         b += '[b][color=' + TEXT_DARK + ']' + (qNum++) + '. Я употреблял(а) другие запрещенные вещества в течение последнего года[/color][/b]\n[list]\n' + radio(val('bg_drugs'), defaultYesNo) + '\n[/list]\n';
         b += '[b][color=' + TEXT_DARK + ']' + (qNum++) + '. Я совершал(а) кражу или хищение на сумму 950 долларов США или более[/color][/b]\n[list]\n' + radio(val('bg_theft'), defaultYesNo) + '\n[/list]\n';
-        b += '[/list][/box]';
+        b += '[/box]';
 
         // V. ДЕКЛАРАЦИЯ И ПОДТВЕРЖДЕНИЕ
-        b += '[box=' + COL_LIGHT + '][list]\n';
+        b += '[box=' + COL_LIGHT + ']\n';
         b += '[size=100][color=' + ACCENT + '][b]V. ДЕКЛАРАЦИЯ И ПОДТВЕРЖДЕНИЕ[/b][/color][/size]\n';
         b += '[justify][color=' + TEXT_DARK + ']Я, нижеподписавшийся(-аяся), настоящим подтверждаю под страхом наказания за лжесвидетельство, что вся вышеуказанная информация является точной и полной, насколько мне известно.[/color][/justify]\n';
         b += '[b][color=' + TEXT_DARK + ']Подпись:[/color][/b] ' + cval('decl_sign') + '\n';
         b += '[b][color=' + TEXT_DARK + ']Дата:[/color][/b] [color=' + TEXT_DARK + ']' + val('decl_dm') + '/' + val('decl_dd') + '/' + val('decl_dy') + '[/color]\n';
-        b += '[/list][/box]';
+        b += '[/box]';
 
         // VI. OUT OF CHARACTER ВОПРОСЫ
-        b += '[box=' + COL_WHITE + '][list]\n';
+        b += '[box=' + COL_WHITE + ']\n';
         b += '[size=100][color=' + ACCENT + '][b]VI. OUT OF CHARACTER ВОПРОСЫ[/b][/color][/size]\n';
 
         var oPrefix = (type && typeof type === 'string') ? type.toLowerCase() : 'cso';
@@ -285,7 +285,7 @@ document.addEventListener("DOMContentLoaded", function() {
             b += '[coll][b][color=' + TEXT_DARK + ']Согласие на отпечатки:[/color][/b] ' + radio(val('ooc_cso_fp'), ['Да', 'Нет']).split('\n').join(' ') + '\n[b][color=' + TEXT_DARK + ']Прочитаны обязательные темы:[/color][/b] ' + radio(val('ooc_cso_read'), ['Да', 'Нет']).split('\n').join(' ') + '[/coll]\n';
             b += '[b][color=' + TEXT_DARK + ']Представление персонажа:[/color][/b]\n[justify]' + cval('ooc_cso_bio') + '[/justify]\n';
         }
-        b += '[/list][/box]';
+        b += '[/box]';
 
         // ПОДВАЛ
         b += '[box=' + COL_DARK + '][center][size=80][color=#ffffff]LOS SANTOS COUNTY SHERIFF\'S DEPARTMENT / CIVILIAN MANAGEMENT BUREAU[/color][/size][/center][/box]';
