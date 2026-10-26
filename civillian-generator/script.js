@@ -179,12 +179,10 @@ document.addEventListener("DOMContentLoaded", function() {
         var nowD = new Date();
         var todayStr = nowD.getDate() + ' ' + months[nowD.getMonth()] + ' ' + nowD.getFullYear();
 
-        // ШАПКА
-        b += '[box=' + COL_LIGHT + '][list]\n';
-        b += '[coll][font=Arial][size=130][color=' + ACCENT + '][b]LOS SANTOS COUNTY SHERIFF\'ْس DEPARTMENT[/b][/color][/size]\n';
+        // ШАПКА (исправлено выравнивание через таблицы/флоаты без смещения)
+        b += '[box=' + COL_LIGHT + '][list][float=right][img=60]https://i.imgur.com/1IZekQj.png[/img][/float][font=Arial][size=130][color=' + ACCENT + '][b]LOS SANTOS COUNTY SHERIFF\'S DEPARTMENT[/b][/color][/size]\n';
         b += '[size=85][color=' + ACCENT2 + '][b]CIVILIAN MANAGEMENT BUREAU[/b][/color][/size]\n';
-        b += '[size=85][color=' + ACCENT3 + '][b]CIVILIAN EMPLOYMENT APPLICATION[/b][/color][/size][/font]|[right][img]https://i.imgur.com/1IZekQj.png[/img][/right][/coll]\n';
-        b += '[/list][/box]';
+        b += '[size=85][color=' + ACCENT3 + '][b]CIVILIAN EMPLOYMENT APPLICATION[/b][/color][/size][/font][/list][/box]';
 
         // ТИТУЛЬНЫЙ БЛОК
         b += '[box=' + COL_WHITE + '][list]\n';
@@ -290,7 +288,7 @@ document.addEventListener("DOMContentLoaded", function() {
         b += '[/list][/box]';
 
         // ПОДВАЛ
-        b += '[box=' + COL_DARK + '][center][size=80][color=#ffffff]LOS SANTOS COUNTY SHERIFF\'ْس DEPARTMENT / CIVILIAN MANAGEMENT BUREAU[/color][/size][/center][/box]';
+        b += '[box=' + COL_DARK + '][center][size=80][color=#ffffff]LOS SANTOS COUNTY SHERIFF\'S DEPARTMENT / CIVILIAN MANAGEMENT BUREAU[/color][/size][/center][/box]';
 
         document.getElementById('out_subject').value = generatedSubject;
         document.getElementById('out_bbcode').value = b;
