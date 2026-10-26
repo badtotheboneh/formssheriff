@@ -116,18 +116,15 @@ document.addEventListener("DOMContentLoaded", function() {
         if (w) w.classList.toggle('visible', this.value === 'Да');
     });
 
-    // Функция получения чистого значения без тегов
     var val = function(id) {
         var el = document.getElementById(id);
         return (el && el.value.trim() !== '') ? el.value.trim() : 'Ответ писать здесь';
     };
 
-    // Обертка для вывода ответов в темном цвете (#1a2920) на форуме
     var cval = function(id) {
         return '[color=#1a2920]' + val(id) + '[/color]';
     };
 
-    // Чекбоксы форума
     var cb = function(isChecked) {
         return isChecked ? '[cbf][/cbf]' : '[cb][/cb]';
     };
@@ -142,7 +139,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Генерация BBCode
     safeAddListener('civilianSubmitBtn', 'click', function() {
-        // Объявляем палитру цветов в самом начале функции, чтобы избежать ReferenceError
         var COL_LIGHT = '#f2f6f4';
         var COL_WHITE = '#ffffff';
         var COL_DARK = '#2A4334';
@@ -183,34 +179,34 @@ document.addEventListener("DOMContentLoaded", function() {
         var nowD = new Date();
         var todayStr = nowD.getDate() + ' ' + months[nowD.getMonth()] + ' ' + nowD.getFullYear();
 
-        // ШАПКА
-        b += '[box=' + COL_LIGHT + '][list][float=right][img]https://i.imgur.com/1IZekQj.png[/img][/float][left][font=Arial][size=130][color=' + ACCENT + '][b]LOS SANTOS COUNTY SHERIFF\'S DEPARTMENT[/b][/color][/size]\n';
+        // ШАПКА (исправлено выравнивание через таблицы/флоаты без смещения)
+        b += '[box=' + COL_LIGHT + '][list][float=right][img=60]https://i.imgur.com/1IZekQj.png[/img][/float][font=Arial][size=130][color=' + ACCENT + '][b]LOS SANTOS COUNTY SHERIFF\'S DEPARTMENT[/b][/color][/size]\n';
         b += '[size=85][color=' + ACCENT2 + '][b]CIVILIAN MANAGEMENT BUREAU[/b][/color][/size]\n';
-        b += '[size=85][color=' + ACCENT3 + '][b]CIVILIAN EMPLOYMENT APPLICATION[/b][/color][/size][/font][/left][/list][/box]';
+        b += '[size=85][color=' + ACCENT3 + '][b]CIVILIAN EMPLOYMENT APPLICATION[/b][/color][/size][/font][/list][/box]';
 
         // ТИТУЛЬНЫЙ БЛОК
         b += '[box=' + COL_WHITE + '][list]\n';
         b += '[center][size=120][color=' + ACCENT + '][b]CIVILIAN EMPLOYMENT APPLICATION[/b][/color][/size]\n';
         b += '[size=90][color=' + ACCENT2 + '][b]' + posTitle + '[/b][/color][/size][/center]\n';
         b += '[hr][/hr]\n';
-        b += '[coll][b]ЗАЯВИТЕЛЬ:[/b] [color=' + TEXT_DARK + ']' + first + ' ' + last + '[/color]\n';
-        b += '[b]ДАТА ПОДАЧИ:[/b] [color=' + TEXT_DARK + ']' + todayStr + '[/color]|[b]ТИП ДОЛЖНОСТИ:[/b] [color=' + TEXT_DARK + ']' + posTitle + '[/color]\n';
-        b += '[b]СТАТУС:[/b] [color=' + ACCENT + '][b]НА РАССМОТРЕНИИ[/b][/color][/coll]\n';
+        b += '[coll][b][color=' + TEXT_DARK + ']ЗАЯВИТЕЛЬ:[/color][/b] ' + cval('f_first') + ' ' + cval('f_last') + '\n';
+        b += '[b][color=' + TEXT_DARK + ']ДАТА ПОДАЧИ:[/color][/b] [color=' + TEXT_DARK + ']' + todayStr + '[/color]|[b][color=' + TEXT_DARK + ']ТИП ДОЛЖНОСТИ:[/color][/b] [color=' + TEXT_DARK + ']' + posTitle + '[/color]\n';
+        b += '[b][color=' + TEXT_DARK + ']СТАТУС:[/color][/b] [color=' + ACCENT + '][b]НА РАССМОТРЕНИИ[/b][/color][/coll]\n';
         b += '[/list][/box]';
 
         // I. ЛИЧНАЯ ИНФОРМАЦИЯ
         b += '[box=' + COL_LIGHT + '][list]\n';
         b += '[size=100][color=' + ACCENT + '][b]I. ЛИЧНАЯ ИНФОРМАЦИЯ[/b][/color][/size]\n';
-        b += '[coll][b]Имя:[/b] ' + cval('f_first') + '\n[b]Второе имя:[/b] ' + cval('f_middle') + '|[b]Фамилия:[/b] ' + cval('f_last') + '\n[b]Дата рождения:[/b] [color=' + TEXT_DARK + ']' + val('f_dob_m') + '/' + val('f_dob_d') + '/' + val('f_dob_y') + '[/color][/coll]\n';
-        b += '[coll][b]Место рождения:[/b] ' + cval('f_birthplace') + '\n[b]Пол:[/b] ' + cval('f_gender') + '|[b]Раса:[/b] ' + cval('f_race') + '\n[b]Семейное положение:[/b] ' + cval('f_marital') + '[/coll]\n';
-        b += '[coll][b]Рост:[/b] [color=' + TEXT_DARK + ']' + val('f_height') + ' футов[/color]\n[b]Вес:[/b] [color=' + TEXT_DARK + ']' + val('f_weight') + ' фунтов[/color]|[b]Телефон:[/b] ' + cval('f_phone') + '\n[b]Email:[/b] ' + cval('f_email') + '[/coll]\n';
-        b += '[b]Адрес:[/b] [color=' + TEXT_DARK + ']' + val('f_addr_street') + ', ' + val('f_addr_city') + ', ' + val('f_addr_state') + '[/color]\n';
+        b += '[coll][b][color=' + TEXT_DARK + ']Имя:[/color][/b] ' + cval('f_first') + '\n[b][color=' + TEXT_DARK + ']Второе имя:[/color][/b] ' + cval('f_middle') + '|[b][color=' + TEXT_DARK + ']Фамилия:[/color][/b] ' + cval('f_last') + '\n[b][color=' + TEXT_DARK + ']Дата рождения:[/color][/b] [color=' + TEXT_DARK + ']' + val('f_dob_m') + '/' + val('f_dob_d') + '/' + val('f_dob_y') + '[/color][/coll]\n';
+        b += '[coll][b][color=' + TEXT_DARK + ']Место рождения:[/color][/b] ' + cval('f_birthplace') + '\n[b][color=' + TEXT_DARK + ']Пол:[/color][/b] ' + cval('f_gender') + '|[b][color=' + TEXT_DARK + ']Раса:[/color][/b] ' + cval('f_race') + '\n[b][color=' + TEXT_DARK + ']Семейное положение:[/color][/b] ' + cval('f_marital') + '[/coll]\n';
+        b += '[coll][b][color=' + TEXT_DARK + ']Рост:[/color][/b] [color=' + TEXT_DARK + ']' + val('f_height') + ' футов[/color]\n[b][color=' + TEXT_DARK + ']Вес:[/color][/b] [color=' + TEXT_DARK + ']' + val('f_weight') + ' фунтов[/color]|[b][color=' + TEXT_DARK + ']Телефон:[/color][/b] ' + cval('f_phone') + '\n[b][color=' + TEXT_DARK + ']Email:[/color][/b] ' + cval('f_email') + '[/coll]\n';
+        b += '[b][color=' + TEXT_DARK + ']Адрес:[/color][/b] [color=' + TEXT_DARK + ']' + val('f_addr_street') + ', ' + val('f_addr_city') + ', ' + val('f_addr_state') + '[/color]\n';
         b += '[/list][/box]';
 
         // II. ОБРАЗОВАНИЕ
         b += '[box=' + COL_WHITE + '][list]\n';
         b += '[size=100][color=' + ACCENT + '][b]II. ОБРАЗОВАНИЕ[/b][/color][/size]\n';
-        b += '[coll][b]Уровень образования:[/b] ' + cval('f_edu_level') + '\n[b]Учебное заведение:[/b] ' + cval('f_edu_name') + '|[b]Период обучения:[/b] ' + cval('f_edu_period') + '\n[b]Специальность:[/b] ' + cval('f_edu_major') + '[/coll]\n';
+        b += '[coll][b][color=' + TEXT_DARK + ']Уровень образования:[/color][/b] ' + cval('f_edu_level') + '\n[b][color=' + TEXT_DARK + ']Учебное заведение:[/color][/b] ' + cval('f_edu_name') + '|[b][color=' + TEXT_DARK + ']Период обучения:[/color][/b] ' + cval('f_edu_period') + '\n[b][color=' + TEXT_DARK + ']Специальность:[/color][/b] ' + cval('f_edu_major') + '[/coll]\n';
         b += '[/list][/box]';
 
         // III. ОПЫТ РАБОТЫ
@@ -219,8 +215,8 @@ document.addEventListener("DOMContentLoaded", function() {
         for (var i = 1; i <= 3; i++) {
             var jt = i === 1 ? 'ПЕРВОЕ МЕСТО РАБОТЫ' : i === 2 ? 'ВТОРОЕ МЕСТО РАБОТЫ' : 'ТРЕТЬЕ МЕСТО РАБОТЫ';
             b += '[b][color=' + ACCENT2 + ']' + jt + '[/color][/b]\n';
-            b += '[coll][b]Компания:[/b] ' + cval('f_job' + i + '_co') + '\n[b]Должность:[/b] ' + cval('f_job' + i + '_pos') + '|[b]Период работы:[/b] ' + cval('f_job' + i + '_period') + '\n[b]Причина увольнения:[/b] ' + cval('f_job' + i + '_reason') + '[/coll]\n';
-            b += '[justify][b]Обязанности:[/b] ' + cval('f_job' + i + '_desc') + '[/justify]\n';
+            b += '[coll][b][color=' + TEXT_DARK + ']Компания:[/color][/b] ' + cval('f_job' + i + '_co') + '\n[b][color=' + TEXT_DARK + ']Должность:[/color][/b] ' + cval('f_job' + i + '_pos') + '|[b][color=' + TEXT_DARK + ']Период работы:[/color][/b] ' + cval('f_job' + i + '_period') + '\n[b][color=' + TEXT_DARK + ']Причина увольнения:[/color][/b] ' + cval('f_job' + i + '_reason') + '[/coll]\n';
+            b += '[justify][b][color=' + TEXT_DARK + ']Обязанности:[/color][/b] ' + cval('f_job' + i + '_desc') + '[/justify]\n';
             if (i < 3) b += '[hr][/hr]\n';
         }
         b += '[/list][/box]';
@@ -230,41 +226,41 @@ document.addEventListener("DOMContentLoaded", function() {
         b += '[size=100][color=' + ACCENT + '][b]IV. ВОПРОСЫ ПРОВЕРКИ БИОГРАФИИ[/b][/color][/size]\n';
         var qNum = 19;
 
-        b += '[b]' + (qNum++) + '. Я имею действительное водительское удостоверение штата Сан-Андреас[/b]\n[list]\n' + radio(val('bg_license'), defaultYesNo) + '\n[/list]\n';
-        if (type === 'TOW') b += '[b]' + (qNum++) + '. Я имею опыт управления спецтехникой / крупногабаритным транспортом[/b]\n[list]\n' + radio(val('bg_tow_equip'), defaultYesNo) + '\n[/list]\n';
-        if (type === 'ABP') b += '[b]' + (qNum++) + '. Я имею действительную лицензию пилота вертолёта (SAAA / FAA)[/b]\n[list]\n' + radio(val('bg_abp_heli'), defaultYesNo) + '\n[/list]\n';
+        b += '[b][color=' + TEXT_DARK + ']' + (qNum++) + '. Я имею действительное водительское удостоверение штата Сан-Андреас[/color][/b]\n[list]\n' + radio(val('bg_license'), defaultYesNo) + '\n[/list]\n';
+        if (type === 'TOW') b += '[b][color=' + TEXT_DARK + ']' + (qNum++) + '. Я имею опыт управления спецтехникой / крупногабаритным транспортом[/color][/b]\n[list]\n' + radio(val('bg_tow_equip'), defaultYesNo) + '\n[/list]\n';
+        if (type === 'ABP') b += '[b][color=' + TEXT_DARK + ']' + (qNum++) + '. Я имею действительную лицензию пилота вертолёта (SAAA / FAA)[/color][/b]\n[list]\n' + radio(val('bg_abp_heli'), defaultYesNo) + '\n[/list]\n';
 
-        b += '[b]' + (qNum++) + '. Я имею законное право на работу в Соединенных Штатах Америки[/b]\n[list]\n' + radio(val('bg_work'), defaultYesNo) + '\n[/list]\n';
-        b += '[b]' + (qNum++) + '. Я узнал(а) о данной вакансии через[/b]\n[list]\n' + radio(val('bg_source'), ['Веб-сайт LSSD', 'Сайт станции шерифа', 'Социальные сети', 'Кампус университета', 'Ярмарку вакансий или семинар', 'Сотрудника LSSD', 'Сотрудника округа Лос-Сантос', 'Члена семьи', 'Друзей или соседей', 'Радио', 'Рекламный щит', 'Другое']) + '\n[/list]\n';
-        b += '[b]' + (qNum++) + '. Помимо английского, я владею следующими языками[/b]\n[list]' + cval('bg_languages') + '[/list]\n';
-        b += '[b]' + (qNum++) + '. Я являюсь лицом с ограниченными возможностями[/b]\n[list]\n' + radio(val('bg_disability'), defaultYesNo) + '\n[/list]\n';
+        b += '[b][color=' + TEXT_DARK + ']' + (qNum++) + '. Я имею законное право на работу в Соединенных Штатах Америки[/color][/b]\n[list]\n' + radio(val('bg_work'), defaultYesNo) + '\n[/list]\n';
+        b += '[b][color=' + TEXT_DARK + ']' + (qNum++) + '. Я узнал(а) о данной вакансии через[/color][/b]\n[list]\n' + radio(val('bg_source'), ['Веб-сайт LSSD', 'Сайт станции шерифа', 'Социальные сети', 'Кампус университета', 'Ярмарку вакансий или семинар', 'Сотрудника LSSD', 'Сотрудника округа Лос-Сантос', 'Члена семьи', 'Друзей или соседей', 'Радио', 'Рекламный щит', 'Другое']) + '\n[/list]\n';
+        b += '[b][color=' + TEXT_DARK + ']' + (qNum++) + '. Помимо английского, я владею следующими языками[/color][/b]\n[list]' + cval('bg_languages') + '[/list]\n';
+        b += '[b][color=' + TEXT_DARK + ']' + (qNum++) + '. Я являюсь лицом с ограниченными возможностями[/color][/b]\n[list]\n' + radio(val('bg_disability'), defaultYesNo) + '\n[/list]\n';
 
         var mVal = val('bg_military');
-        b += '[b]' + (qNum++) + '. Я являюсь действующим или бывшим военнослужащим Вооруженных сил США[/b]\n[list]\n';
-        b += cb(mVal === 'Да, я прохожу службу в настоящее время') + ' [color=' + TEXT_DARK + ']Да, я прохожу службу в настоящее время[/color]\n[list]Род войск: ' + cval('bg_mil_active') + '[/list]\n';
-        b += cb(mVal === 'Да, я проходил(а) службу ранее') + ' [color=' + TEXT_DARK + ']Да, я проходил(а) службу ранее[/color]\n[list]Род войск: ' + cval('bg_mil_prev') + '[/list]\n';
+        b += '[b][color=' + TEXT_DARK + ']' + (qNum++) + '. Я являюсь действующим или бывшим военнослужащим Вооруженных сил США[/color][/b]\n[list]\n';
+        b += cb(mVal === 'Да, я прохожу службу в настоящее время') + ' [color=' + TEXT_DARK + ']Да, я прохожу службу в настоящее время[/color]\n[list][color=' + TEXT_DARK + ']Род войск: ' + val('bg_mil_active') + '[/color][/list]\n';
+        b += cb(mVal === 'Да, я проходил(а) службу ранее') + ' [color=' + TEXT_DARK + ']Да, я проходил(а) службу ранее[/color]\n[list][color=' + TEXT_DARK + ']Род войск: ' + val('bg_mil_prev') + '[/color][/list]\n';
         b += cb(mVal === 'Нет') + ' [color=' + TEXT_DARK + ']Нет[/color]\n' + cb(mVal === 'Не знаю') + ' [color=' + TEXT_DARK + ']Не знаю[/color]\n' + cb(mVal === 'Не хочу отвечать') + ' [color=' + TEXT_DARK + ']Не хочу отвечать[/color]\n' + cb(mVal === 'Другое') + ' [color=' + TEXT_DARK + ']Другое[/color]\n[/list]\n';
 
-        b += '[b]' + (qNum++) + '. В настоящее время я нахожусь под уголовной пробацией или на условно-досрочном освобождении[/b]\n[list]\n' + radio(val('bg_probation'), defaultYesNo) + '\n[/list]\n';
+        b += '[b][color=' + TEXT_DARK + ']' + (qNum++) + '. В настоящее время я нахожусь под уголовной пробацией или на условно-досрочном освобождении[/color][/b]\n[list]\n' + radio(val('bg_probation'), defaultYesNo) + '\n[/list]\n';
 
         var duiVal = val('bg_dui');
-        b += '[b]' + (qNum++) + '. Я имею судимости за вождение в состоянии алкогольного или наркотического опьянения в Сан-Андреас и/или других штатах[/b]\n[list]\n';
-        b += cb(duiVal === 'Да') + ' [color=' + TEXT_DARK + ']Да[/color]\n[list]Укажите штат(ы) и год(ы) судимости: ' + cval('bg_dui_detail') + '[/list]\n' + cb(duiVal === 'Нет') + ' [color=' + TEXT_DARK + ']Нет[/color]\n' + cb(duiVal === 'Не знаю') + ' [color=' + TEXT_DARK + ']Не знаю[/color]\n' + cb(duiVal === 'Не хочу отвечать') + ' [color=' + TEXT_DARK + ']Не хочу отвечать[/color]\n' + cb(duiVal === 'Другое') + ' [color=' + TEXT_DARK + ']Другое[/color]\n[/list]\n';
+        b += '[b][color=' + TEXT_DARK + ']' + (qNum++) + '. Я имею судимости за вождение в состоянии алкогольного или наркотического опьянения в Сан-Андреас и/или других штатах[/color][/b]\n[list]\n';
+        b += cb(duiVal === 'Да') + ' [color=' + TEXT_DARK + ']Да[/color]\n[list][color=' + TEXT_DARK + ']Укажите штат(ы) и год(ы) судимости: ' + val('bg_dui_detail') + '[/color][/list]\n' + cb(duiVal === 'Нет') + ' [color=' + TEXT_DARK + ']Нет[/color]\n' + cb(duiVal === 'Не знаю') + ' [color=' + TEXT_DARK + ']Не знаю[/color]\n' + cb(duiVal === 'Не хочу отвечать') + ' [color=' + TEXT_DARK + ']Не хочу отвечать[/color]\n' + cb(duiVal === 'Другое') + ' [color=' + TEXT_DARK + ']Другое[/color]\n[/list]\n';
 
         var mjVal = val('bg_marijuana');
-        b += '[b]' + (qNum++) + '. Я употреблял(а) марихуану в течение последнего года[/b]\n[list]\n';
-        b += cb(mjVal === 'Да') + ' [color=' + TEXT_DARK + ']Да[/color]\n[list]Укажите месяц(ы) и год(ы) употребления: ' + cval('bg_marijuana_detail') + '[/list]\n' + cb(mjVal === 'Нет') + ' [color=' + TEXT_DARK + ']Нет[/color]\n' + cb(mjVal === 'Не знаю') + ' [color=' + TEXT_DARK + ']Не знаю[/color]\n' + cb(mjVal === 'Не хочу отвечать') + ' [color=' + TEXT_DARK + ']Не хочу отвечать[/color]\n' + cb(mjVal === 'Другое') + ' [color=' + TEXT_DARK + ']Другое[/color]\n[/list]\n';
+        b += '[b][color=' + TEXT_DARK + ']' + (qNum++) + '. Я употреблял(а) марихуану в течение последнего года[/color][/b]\n[list]\n';
+        b += cb(mjVal === 'Да') + ' [color=' + TEXT_DARK + ']Да[/color]\n[list][color=' + TEXT_DARK + ']Укажите месяц(ы) и год(ы) употребления: ' + val('bg_marijuana_detail') + '[/color][/list]\n' + cb(mjVal === 'Нет') + ' [color=' + TEXT_DARK + ']Нет[/color]\n' + cb(mjVal === 'Не знаю') + ' [color=' + TEXT_DARK + ']Не знаю[/color]\n' + cb(mjVal === 'Не хочу отвечать') + ' [color=' + TEXT_DARK + ']Не хочу отвечать[/color]\n' + cb(mjVal === 'Другое') + ' [color=' + TEXT_DARK + ']Другое[/color]\n[/list]\n';
 
-        b += '[b]' + (qNum++) + '. Я употреблял(а) другие запрещенные вещества в течение последнего года[/b]\n[list]\n' + radio(val('bg_drugs'), defaultYesNo) + '\n[/list]\n';
-        b += '[b]' + (qNum++) + '. Я совершал(а) кражу или хищение на сумму 950 долларов США или более[/b]\n[list]\n' + radio(val('bg_theft'), defaultYesNo) + '\n[/list]\n';
+        b += '[b][color=' + TEXT_DARK + ']' + (qNum++) + '. Я употреблял(а) другие запрещенные вещества в течение последнего года[/color][/b]\n[list]\n' + radio(val('bg_drugs'), defaultYesNo) + '\n[/list]\n';
+        b += '[b][color=' + TEXT_DARK + ']' + (qNum++) + '. Я совершал(а) кражу или хищение на сумму 950 долларов США или более[/color][/b]\n[list]\n' + radio(val('bg_theft'), defaultYesNo) + '\n[/list]\n';
         b += '[/list][/box]';
 
         // V. ДЕКЛАРАЦИЯ И ПОДТВЕРЖДЕНИЕ
         b += '[box=' + COL_LIGHT + '][list]\n';
         b += '[size=100][color=' + ACCENT + '][b]V. ДЕКЛАРАЦИЯ И ПОДТВЕРЖДЕНИЕ[/b][/color][/size]\n';
-        b += '[justify]Я, нижеподписавшийся(-аяся), настоящим подтверждаю под страхом наказания за лжесвидетельство, что вся вышеуказанная информация является точной и полной, насколько мне известно.[/justify]\n';
-        b += '[b]Подпись:[/b] ' + cval('decl_sign') + '\n';
-        b += '[b]Дата:[/b] [color=' + TEXT_DARK + ']' + val('decl_dm') + '/' + val('decl_dd') + '/' + val('decl_dy') + '[/color]\n';
+        b += '[justify][color=' + TEXT_DARK + ']Я, нижеподписавшийся(-аяся), настоящим подтверждаю под страхом наказания за лжесвидетельство, что вся вышеуказанная информация является точной и полной, насколько мне известно.[/color][/justify]\n';
+        b += '[b][color=' + TEXT_DARK + ']Подпись:[/color][/b] ' + cval('decl_sign') + '\n';
+        b += '[b][color=' + TEXT_DARK + ']Дата:[/color][/b] [color=' + TEXT_DARK + ']' + val('decl_dm') + '/' + val('decl_dd') + '/' + val('decl_dy') + '[/color]\n';
         b += '[/list][/box]';
 
         // VI. OUT OF CHARACTER ВОПРОСЫ
@@ -273,21 +269,21 @@ document.addEventListener("DOMContentLoaded", function() {
 
         var oPrefix = (type && typeof type === 'string') ? type.toLowerCase() : 'cso';
         var tVal = val('ooc_' + oPrefix + '_banned');
-        var bStr = cb(tVal === 'Да') + ' [color=' + TEXT_DARK + ']Да[/color]\n[list]Пояснение: ' + cval('ooc_' + oPrefix + '_banned_detail') + '[/list]\n' + cb(tVal === 'Нет') + ' [color=' + TEXT_DARK + ']Нет[/color]';
+        var bStr = cb(tVal === 'Да') + ' [color=' + TEXT_DARK + ']Да[/color]\n[list][color=' + TEXT_DARK + ']Пояснение: ' + val('ooc_' + oPrefix + '_banned_detail') + '[/color][/list]\n' + cb(tVal === 'Нет') + ' [color=' + TEXT_DARK + ']Нет[/color]';
 
         if (type === 'TOW' || type === 'ABP') {
-            b += '[coll][b]Часовой пояс:[/b] ' + cval('ooc_' + oPrefix + '_tz') + '\n[b]UCP:[/b] ' + cval('ooc_' + oPrefix + '_ucp') + '|[b]Форум:[/b] ' + cval('ooc_' + oPrefix + '_forum') + '\n[b]Дабл-фракция:[/b] ' + cval('ooc_' + oPrefix + '_double') + '[/coll]\n';
-            b += '[b]Скриншот истории наказаний из UCP:[/b] ' + cval('ooc_' + oPrefix + '_punish') + '\n';
-            b += '[b]Исключали ли вас или банили в других официальных фракциях?[/b]\n[list]\n' + bStr + '\n[/list]\n';
-            b += '[coll][b]Согласие на отпечатки и фото (IC):[/b] ' + radio(val('ooc_' + oPrefix + '_fp'), ['Да', 'Нет']).split('\n').join(' ') + '\n[b]Рабочий микрофон / TS / Discord:[/b] ' + radio(val('ooc_' + oPrefix + '_mic'), ['Да', 'Нет']).split('\n').join(' ') + '|[b]Прочитаны обязательные темы:[/b] ' + radio(val('ooc_' + oPrefix + '_read'), ['Да', 'Нет']).split('\n').join(' ') + '\n[/coll]\n';
-            b += '[b]Представление персонажа:[/b]\n[justify]' + cval('ooc_' + oPrefix + '_bio') + '[/justify]\n';
+            b += '[coll][b][color=' + TEXT_DARK + ']Часовой пояс:[/color][/b] ' + cval('ooc_' + oPrefix + '_tz') + '\n[b][color=' + TEXT_DARK + ']UCP:[/color][/b] ' + cval('ooc_' + oPrefix + '_ucp') + '|[b][color=' + TEXT_DARK + ']Форум:[/color][/b] ' + cval('ooc_' + oPrefix + '_forum') + '\n[b][color=' + TEXT_DARK + ']Дабл-фракция:[/color][/b] ' + cval('ooc_' + oPrefix + '_double') + '[/coll]\n';
+            b += '[b][color=' + TEXT_DARK + ']Скриншот истории наказаний из UCP:[/color][/b] ' + cval('ooc_' + oPrefix + '_punish') + '\n';
+            b += '[b][color=' + TEXT_DARK + ']Исключали ли вас или банили в других официальных фракциях?[/color][/b]\n[list]\n' + bStr + '\n[/list]\n';
+            b += '[coll][b][color=' + TEXT_DARK + ']Согласие на отпечатки и фото (IC):[/color][/b] ' + radio(val('ooc_' + oPrefix + '_fp'), ['Да', 'Нет']).split('\n').join(' ') + '\n[b][color=' + TEXT_DARK + ']Рабочий микрофон / TS / Discord:[/b] ' + radio(val('ooc_' + oPrefix + '_mic'), ['Да', 'Нет']).split('\n').join(' ') + '|[b][color=' + TEXT_DARK + ']Прочитаны обязательные темы:[/color][/b] ' + radio(val('ooc_' + oPrefix + '_read'), ['Да', 'Нет']).split('\n').join(' ') + '\n[/coll]\n';
+            b += '[b][color=' + TEXT_DARK + ']Представление персонажа:[/color][/b]\n[justify]' + cval('ooc_' + oPrefix + '_bio') + '[/justify]\n';
         } else {
-            b += '[coll][b]Часовой пояс:[/b] ' + cval('ooc_cso_tz') + '\n[b]UCP:[/b] ' + cval('ooc_cso_ucp') + '|[b]Discord:[/b] ' + cval('ooc_cso_discord') + '\n[b]Дабл-фракция:[/b] ' + cval('ooc_cso_double') + '[/coll]\n';
-            b += '[b]Скриншот истории наказаний из UCP:[/b] ' + cval('ooc_cso_punish') + '\n';
-            b += '[b]Профиль на форуме Gambit:[/b] ' + cval('ooc_cso_gambit') + '\n';
-            b += '[b]Исключали ли вас или банили в других официальных фракциях?[/b]\n[list]\n' + bStr + '\n[/list]\n';
-            b += '[coll][b]Согласие на отпечатки:[/b] ' + radio(val('ooc_cso_fp'), ['Да', 'Нет']).split('\n').join(' ') + '\n[b]Прочитаны обязательные темы:[/b] ' + radio(val('ooc_cso_read'), ['Да', 'Нет']).split('\n').join(' ') + '[/coll]\n';
-            b += '[b]Представление персонажа:[/b]\n[justify]' + cval('ooc_cso_bio') + '[/justify]\n';
+            b += '[coll][b][color=' + TEXT_DARK + ']Часовой пояс:[/color][/b] ' + cval('ooc_cso_tz') + '\n[b][color=' + TEXT_DARK + ']UCP:[/color][/b] ' + cval('ooc_cso_ucp') + '|[b][color=' + TEXT_DARK + ']Discord:[/color][/b] ' + cval('ooc_cso_discord') + '\n[b][color=' + TEXT_DARK + ']Дабл-фракция:[/color][/b] ' + cval('ooc_cso_double') + '[/coll]\n';
+            b += '[b][color=' + TEXT_DARK + ']Скриншот истории наказаний из UCP:[/color][/b] ' + cval('ooc_cso_punish') + '\n';
+            b += '[b][color=' + TEXT_DARK + ']Профиль на форуме Gambit:[/color][/b] ' + cval('ooc_cso_gambit') + '\n';
+            b += '[b][color=' + TEXT_DARK + ']Исключали ли вас или банили в других официальных фракциях?[/b]\n[list]\n' + bStr + '\n[/list]\n';
+            b += '[coll][b][color=' + TEXT_DARK + ']Согласие на отпечатки:[/color][/b] ' + radio(val('ooc_cso_fp'), ['Да', 'Нет']).split('\n').join(' ') + '\n[b][color=' + TEXT_DARK + ']Прочитаны обязательные темы:[/color][/b] ' + radio(val('ooc_cso_read'), ['Да', 'Нет']).split('\n').join(' ') + '[/coll]\n';
+            b += '[b][color=' + TEXT_DARK + ']Представление персонажа:[/color][/b]\n[justify]' + cval('ooc_cso_bio') + '[/justify]\n';
         }
         b += '[/list][/box]';
 
