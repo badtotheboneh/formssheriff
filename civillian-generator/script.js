@@ -179,18 +179,18 @@ document.addEventListener("DOMContentLoaded", function() {
         var TEXT_MAIN = '#111827';
 
         // ШАПКА
-        b += '[box=' + COL_LIGHT + '][list][float=right][img]https://i.imgur.com/1IZekQj.png[/img][/float][left][font=Arial][size=130][b]LOS SANTOS COUNTY SHERIFF\'S DEPARTMENT[/b][/size]\n';
-        b += '[size=85][color=' + ACCENT + ']CIVILIAN MANAGEMENT BUREAU[/color][/size]\n';
-        b += '[size=85][color=' + ACCENT2 + ']CIVILIAN EMPLOYMENT APPLICATION[/color][/size][/font][/left][/list][/box]';
+        b += '[box=' + COL_LIGHT + '][list][float=right][img]https://i.imgur.com/1IZekQj.png[/img][/float][left][font=Arial][size=130][color=' + ACCENT + '][b]LOS SANTOS COUNTY SHERIFF\'S DEPARTMENT[/b][/color][/size]\n';
+        b += '[size=85][color=' + ACCENT2 + '][b]CIVILIAN MANAGEMENT BUREAU[/b][/color][/size]\n';
+        b += '[size=85][color=' + ACCENT3 + '][b]CIVILIAN EMPLOYMENT APPLICATION[/b][/color][/size][/font][/left][/list][/box]';
 
         // ТИТУЛЬНЫЙ БЛОК
         b += '[box=' + COL_WHITE + '][list]\n';
-        b += '[center][size=120][b]CIVILIAN EMPLOYMENT APPLICATION[/b][/size]\n';
-        b += '[size=90][color=' + ACCENT3 + ']' + posTitle + '[/color][/size][/center]\n';
+        b += '[center][size=120][color=' + ACCENT + '][b]CIVILIAN EMPLOYMENT APPLICATION[/b][/color][/size]\n';
+        b += '[size=90][color=' + ACCENT2 + '][b]' + posTitle + '[/b][/color][/size][/center]\n';
         b += '[hr][/hr]\n';
-        b += '[coll][b]ЗАЯВИТЕЛЬ:[/b] ' + val('f_first') + ' ' + val('f_last') + '\n';
-        b += '[b]ДАТА ПОДАЧИ:[/b] ' + todayStr + '|[b]ТИП ДОЛЖНОСТИ:[/b] ' + posTitle + '\n';
-        b += '[b]СТАТУС:[/b] [color=' + ACCENT3 + '][b]НА РАССМОТРЕНИИ[/b][/color][/coll]\n';
+        b += '[coll][b]ЗАЯВИТЕЛЬ:[/b] [color=' + TEXT_MAIN + ']' + val('f_first') + ' ' + val('f_last') + '[/color]\n';
+        b += '[b]ДАТА ПОДАЧИ:[/b] [color=' + TEXT_MAIN + ']' + todayStr + '[/color]|[b]ТИП ДОЛЖНОСТИ:[/b] [color=' + TEXT_MAIN + ']' + posTitle + '[/color]\n';
+        b += '[b]СТАТУС:[/b] [color=' + ACCENT + '][b]НА РАССМОТРЕНИИ[/b][/color][/coll]\n';
         b += '[/list][/box]';
 
         // I. ЛИЧНАЯ ИНФОРМАЦИЯ
