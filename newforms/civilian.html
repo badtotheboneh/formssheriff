@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LSSD Civilian Employment: генератор заявлений</title>
+<link rel="stylesheet" href="civilian.css">
+</head>
+<body>
+<div class="page-title">
+<h1>LSSD Civilian Employment: генератор заявлений</h1>
+<p>Выберите должность, заполните анкету и скопируйте заголовок и ББ-код. Вставьте их в новую тему на форуме (в редакторе в режиме <b>[ ]</b>). Прямые ссылки: <code>?type=TOW</code>, <code>?type=ABP</code>, <code>?type=CSO</code>.</p>
+</div>
+<div class="gen-tabs-container">
+<button type="button" class="gen-tab-btn active" data-target="TOW">Tow Truck Operator</button>
+<button type="button" class="gen-tab-btn" data-target="ABP">Relief Pilot (Aero Bureau)</button>
+<button type="button" class="gen-tab-btn" data-target="CSO">Community Service Officer</button>
+</div>
+<div id="gen-error-msg"></div>
+<div class="bb-wrapper" id="doc"></div>
+<div class="bb-wrapper"><details><summary>Показать готовый ББ-код</summary><textarea id="out" readonly></textarea></details></div>
+<div class="gen-bar">
+<button type="button" class="gen-btn ghost" id="copyTitle">Скопировать заголовок</button>
+<button type="button" class="gen-btn" id="copyBB">Скопировать ББ-код</button>
+<button type="button" class="gen-btn ghost" id="clearAll">Очистить анкету</button>
+<span id="gen-status"></span>
+</div>
+<script src="civilian.js"></script>
+</body>
+</html>

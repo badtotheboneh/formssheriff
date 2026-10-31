@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Генераторы OSSB: Gang File, Official Report, Information Card</title>
+<style>
+:root{--bg:#eef0ec;--card:#fff;--ink:#1a202c;--mute:#5d6770;--line:#d5d9d2;--acc:#2c4a3b;--acc2:#3d6b52}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Segoe UI",Roboto,Arial,sans-serif}
+main{max-width:900px;margin:0 auto;padding:24px 16px 110px}
+h1{font-size:26px;margin:0 0 6px}
+.lead{margin:0 0 14px;color:var(--mute)}
+.pick{display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+.pick select{flex:1;min-width:220px;font-weight:600}
+fieldset{background:var(--card);border:1px solid var(--line);border-radius:6px;margin:0 0 16px;padding:8px 18px 18px}
+legend{background:var(--acc);color:#fff;font-weight:600;padding:5px 12px;border-radius:4px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px 16px;margin-top:10px}
+.big{grid-column:1/-1}
+label.t{display:block;font-weight:600;font-size:14px;margin-bottom:4px}
+input[type=text],input[type=date],textarea,select{width:100%;font:inherit;padding:8px 10px;border:1px solid #b9c0b6;border-radius:4px;background:#fbfcfb;color:var(--ink)}
+textarea{min-height:90px;resize:vertical}
+:focus-visible{outline:3px solid #9fc2a6;outline-offset:1px}
+.row{position:relative;border:1px dashed #b9c0b6;border-radius:6px;padding:10px 38px 10px 12px;margin:8px 0}
+.row .rm{position:absolute;top:8px;right:8px;padding:2px 8px}
+.rl{display:block;font-weight:700;color:var(--acc2);margin-bottom:2px}
+.err{color:#b3261e;font-size:13px;margin-top:3px}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:12px 16px;display:flex;gap:10px 12px;align-items:center;justify-content:center;flex-wrap:wrap}
+button{font:inherit;font-weight:600;background:var(--acc);color:#fff;border:0;border-radius:4px;padding:10px 18px;cursor:pointer}
+button:hover{background:var(--acc2)}
+.ghost{background:none;color:var(--acc);border:1px solid var(--acc);padding:6px 12px;font-size:14px}
+.ghost:hover{background:#e3e9e3}
+.bar .ghost{padding:8px 14px;font-size:inherit}
+#st{color:var(--mute);font-size:14px}
+details{margin-top:8px}summary{cursor:pointer;color:var(--mute)}
+#out{min-height:240px;font:13px/1.35 Consolas,monospace;margin-top:8px}
+/* --- документ как на форуме --- */
+.note{background:#fffbe6;border:1px solid #e6d27a;border-radius:4px;padding:6px 10px;font-size:13px;margin:0 0 12px;display:flex;gap:8px;align-items:center}
+.note i{display:inline-block;width:34px;height:14px;background:#fff3b0;border:1px dashed #d9a400;border-radius:2px}
+.doc{max-width:760px;margin:0 auto;background:#fff;border:1px solid #c9d1cc;font:12px/1.5 Verdana,Arial,sans-serif;color:#000;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.blk{padding:6px 8px;border-bottom:1px solid #e3e8e5}.b1{background:#f6f9f7}.b2{background:#fff}
+.hd{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.hd h2{margin:0;font:700 16px Arial,sans-serif}.g1,.g2{display:block;font-size:9.5px}.g1{color:#5f7d6d}.g2{color:#93a89c}
+.logo{width:72px;height:auto}
+.sh{color:#3d6b52;font-weight:700;margin-bottom:2px}
+.t2{display:grid;grid-template-columns:1fr 1fr;border:1px solid #ccc}.t2>div{padding:3px 6px;border:1px solid #ddd;display:flex;gap:6px;align-items:baseline}.t2 .r{justify-content:flex-end}
+.ln{display:flex;gap:6px;align-items:baseline;margin:1px 0}.ln.gap{margin-top:6px}.ln .slot,.t2 .slot{flex:1}
+.slot{display:inline-flex;align-items:baseline;gap:2px;min-width:0}
+.doc .slot input,.doc .slot select,.doc .slot textarea{width:100%;font:12px Verdana,Arial,sans-serif;padding:1px 5px;border:1px dashed #d9a400;background:#fff3b0;color:#000;border-radius:2px;margin:0}
+.doc .slot textarea{display:block;min-height:0;resize:vertical}
+.doc .slot select{width:auto;max-width:100%}
+.doc .slot input:focus,.doc .slot textarea:focus,.doc .slot select:focus{background:#fff;border-style:solid;outline:2px solid #9fc2a6}
+.doc .bad{border:1px solid #b3261e!important;background:#ffe3e0!important}
+.err{color:#b3261e;font-weight:700}
+.xp{display:contents}
+.lst .rw{display:flex;gap:6px;align-items:baseline;margin:2px 0}.lst .rw .xp{display:flex;gap:6px;align-items:baseline;flex:1;min-width:0}
+.bl{font-weight:700;min-width:1.4em}
+.two{display:grid;grid-template-columns:1fr 1fr}
+.two .rw{display:block;position:relative;border:1px solid #d5dcd7;background:#f6f9f7;padding:6px 24px 6px 8px;margin:0}
+.two .rw .xp{display:block}.two .rm{position:absolute;top:3px;right:3px}
+.rm{border:0;background:none;color:#b3261e;font-size:13px;padding:0 4px;cursor:pointer;line-height:1}.rm:hover{background:#fde4e1}
+.add{border:1px dashed #3d6b52;background:#fff;color:#2c4a3b;font:600 12px Verdana,Arial,sans-serif;padding:2px 10px;border-radius:3px;margin:3px 0 0;cursor:pointer}.add:hover{background:#e3efe7}
+.ft{background:#2c4a3b;color:#fff;text-align:center;font-size:10px;padding:5px}.ft i{display:block;color:#a8c2b3;font-size:9px;font-style:normal}
+@media(max-width:640px){.two{grid-template-columns:1fr}.t2{grid-template-columns:1fr}}
+.slot.ta{display:block;flex:1 1 100%;width:100%}
+.doc .slot textarea{min-height:4.6em;line-height:1.45;overflow:hidden;resize:vertical}
+.lst .rw .slot.ta{flex:1;width:auto}
+.lst .rw .xp>.slot:has(select){flex:0 0 auto}
+.doc{max-width:none}
+.h2{background:#005500;color:#fff;text-align:center;padding:10px 8px;font:700 17px/1.3 Arial,sans-serif}.h2 small{display:block;font:600 12px Arial,sans-serif;margin-top:2px}
+.bd{padding:6px 10px;background:#fff}.bd.ol{background:#b6ce5f}
+.bar2{background:#b6ce5f;color:#1e3a8a;font-weight:700;padding:3px 8px;margin:4px 0}
+.sep{color:#1e3a8a;overflow:hidden;white-space:nowrap;line-height:1;margin:6px 0}
+.ft2{background:#b6ce5f;color:#1e3a8a;text-align:center;padding:5px 8px}.ft2 small{display:block;font-size:10px;margin-top:2px}.ln.c{justify-content:center}.ln.r{justify-content:flex-end}
+.gl{height:8px;background:#005500}
+.memo-t{text-align:center;font:700 15px Arial,sans-serif;margin:6px 0}.sg{text-align:right;margin-top:8px}
+.lst.cards .rw{display:block;position:relative;border:1px dashed #9db84a;padding:2px 24px 4px 6px;margin:6px 0;background:transparent}.lst.cards .rw .xp{display:block}.cards .rm{position:absolute;top:3px;right:3px}
+</style>
+</head>
+<body>
+<main>
+<h1>Operation Safe Streets Bureau</h1>
+<p class="lead">Выберите форму и заполняйте документ прямо на странице: он выглядит так же, как будет на форуме. Прямая ссылка на форму: <code>?form=gang</code>, <code>?form=report</code>, <code>?form=card</code>, <code>?form=case</code>, <code>?form=people</code>, <code>?form=memo</code>. Каждая форма хранит свой черновик.</p>
+<div class="note"><i></i>Жёлтым подсвечены поля для ввода. «+ Добавить» и ✕ управляют строками списков.</div>
+<div class="pick"><select id="sel" aria-label="Форма"></select><button id="lnk" type="button" class="ghost">Скопировать ссылку на форму</button></div>
+<form id="f" onsubmit="return false"></form>
+<details><summary>Показать готовый ББ-код</summary><textarea id="out" readonly></textarea></details>
+</main>
+<div class="bar"><button id="cb" type="button">Скопировать ББ-код</button><button id="clr" type="button" class="ghost">Очистить форму</button><span id="st"></span></div>
+
+<script>
+/* ===== Общие элементы оформления ===== */
+const LOGO='https://i.imgur.com/jOfo8EF.png';
+const wrap=(...p)=>`[SIZE=3][COLOR=#1a202c]${p.join('')}[/COLOR][/SIZE]`;
+const head=t=>`[BLOCK=#f6f9f7][TABLE2][TR2][TD2][FONT=Arial][SIZE=4][B]${t}[/B][/SIZE]\n[SIZE=2][COLOR=#5f7d6d]OPERATION SAFE STREETS BUREAU[/COLOR]\n[COLOR=#93a89c]LOS SANTOS COUNTY SHERIFF'S DEPARTMENT, SAN ANDREAS[/COLOR][/SIZE][/FONT][/TD2][TD2][RIGHT][IMG width="90px"]${LOGO}[/IMG][/RIGHT][/TD2][/TR2][/TABLE2][/BLOCK]`;
+const FOOT='[BLOCK=#2c4a3b][CENTER][SIZE=1][COLOR=#ffffff]1120 WHITE AVE., LOS SANTOS, SA 90011\n[COLOR=#a8c2b3]НЕСАНКЦИОНИРОВАННОЕ РАСПРОСТРАНЕНИЕ ПРЕСЛЕДУЕТСЯ ПО ЗАКОНУ[/COLOR][/COLOR][/SIZE][/CENTER][/BLOCK]';
+const sec=(bg,t,b)=>`[BLOCK=${bg}][B][COLOR=#3d6b52]${t}[/COLOR][/B]${b.startsWith('[INDENT]')?'':'\n'}${b}[/BLOCK]`;
+const ind=s=>`[INDENT]${t(s)}[/INDENT]`;
+const t=s=>(s||'').trim()||'-';
+const dt=s=>{if(!s)return'';const[y,m,d]=s.split('-');return `${d}.${m}.${y}`};
+const rows=a=>(a||[]).filter(r=>Object.values(r).some(x=>(x||'').trim()));
+const lst=a=>a.length?'[LIST]'+a.map(x=>'[*]'+x).join('')+'[/LIST]':' -';
+const V=(r,k)=>(r[k]||'').trim();
+
+/* ===== Описание форм: поля (s) и сборка ББ-кода (bb) =====
+   Типы полей: text (по умолчанию), area, date, sel (o:[…]), list (of:[…]), dl:[подсказки] */
+const FORMS={
+gang:{n:'Gang File: дело бандформирования',s:[
+ {t:'Шапка дела',f:[
+  {k:'id',l:'Номер дела',ph:'GF-0001',req:1},
+  {k:'status',l:'Статус',t:'sel',o:['АКТИВНО','ЗАКРЫТО','ПРИОСТАНОВЛЕНО'],req:1},
+  {k:'open',l:'Открыто',t:'date',req:1},
+  {k:'close',l:'Закрыто (пусто = в процессе)',t:'date'},
+  {k:'staff',l:'Сотрудники',t:'list',cls:'big',rl:'Сотрудник',add:'Добавить сотрудника',of:[{k:'v',l:'Имя, Фамилия — Должность',ph:'Ed Galvard — Senior OSS Investigator'}]}]},
+ {t:'Регистрационные данные',f:[
+  {k:'name',l:'Полное наименование',ph:'Полное официальное название бандформирования',req:1,cls:'big'},
+  {k:'type',l:'Тип группировки',dl:['Уличное бандформирование','Другое'],ph:'Уличное бандформирование / Другое'}]},
+ {t:'Характеристика',f:[
+  {k:'colors',l:'Цвета и символика',ph:'Цвета, символика, татуировки',cls:'big'},
+  {k:'terr',l:'Территория влияния',ph:'Районы, улицы, территории под контролем',cls:'big'},
+  {k:'act',l:'Деятельность',t:'area',ph:'Криминальная деятельность, иерархия, известные члены',cls:'big'}]},
+ {t:'Связи и конфликты',f:[
+  {k:'rel',l:'Записи',t:'list',cls:'big',rl:'Запись',add:'Добавить связь / конфликт',of:[
+   {k:'type',l:'Тип',t:'sel',o:['Связь','Конфликт']},{k:'v',l:'Лицо или группировка — характер / причина',ph:'Лицо 1 — характер взаимодействия'}]}]},
+ {t:'Преступная деятельность и отметки',f:[
+  {k:'crime',l:'Преступная деятельность',t:'area',ph:'Противоправные действия, эпизоды, даты, фигуранты',cls:'big'},
+  {k:'notes',l:'Служебные отметки',t:'area',ph:'Дополнительная информация',cls:'big'}]}],
+ bb:v=>{
+  const col={'АКТИВНО':'#3d6b52','ЗАКРЫТО':'#b22222','ПРИОСТАНОВЛЕНО':'#9a6700'}[v.status]||'#3d6b52';
+  return wrap(head('GANG FILE'),
+   `[BLOCK=#ffffff][TABLE2][TR2][TD2][SIZE=4][B][COLOR=#3d6b52]${t(v.id)}[/COLOR][/B][/SIZE][/TD2][TD2][RIGHT][B][COLOR=${col}]● ${t(v.status)}[/COLOR][/B][/RIGHT][/TD2][/TR2][TR2][TD2][B]Открыто:[/B] ${t(dt(v.open))}[/TD2][TD2][B]Закрыто:[/B] ${v.close?dt(v.close):'в процессе'}[/TD2][/TR2][/TABLE2][B]Сотрудники:[/B]${lst(rows(v.staff).map(r=>V(r,'v')))}[/BLOCK]`,
+   sec('#f6f9f7','РЕГИСТРАЦИОННЫЕ ДАННЫЕ',`[B]Полное наименование:[/B] ${t(v.name)}\n[B]Тип группировки:[/B] ${t(v.type)}`),
+   sec('#ffffff','ХАРАКТЕРИСТИКА',`[B]Цвета и символика:[/B] ${t(v.colors)}\n[B]Территория влияния:[/B] ${t(v.terr)}\n[B]Деятельность:[/B]${ind(v.act)}`),
+   sec('#f6f9f7','СВЯЗИ И КОНФЛИКТЫ',lst(rows(v.rel).map(r=>`[B]${r.type||'Связь'}:[/B] ${t(r.v)}`))),
+   sec('#ffffff','ПРЕСТУПНАЯ ДЕЯТЕЛЬНОСТЬ',ind(v.crime)),
+   sec('#f6f9f7','СЛУЖЕБНЫЕ ОТМЕТКИ',ind(v.notes)),FOOT)}},
+
+report:{n:'Official Report: отчёт о проведённых операциях',s:[
+ {t:'Шапка',f:[
+  {k:'date',l:'Дата',t:'date',req:1},
+  {k:'off',l:'Сотрудник',ph:'Имя, Фамилия',req:1}]},
+ {t:'Отчёт о проведённых операциях по бандоподавлению',f:[
+  {k:'items',l:'Пункты отчёта',t:'list',cls:'big',min:2,rl:'Пункт',add:'Добавить пункт',of:[{k:'v',l:'Действия сотрудника',t:'area',ph:'Опишите проведённые действия'}]}]}],
+ bb:v=>wrap(head('OFFICIAL REPORT'),
+  `[BLOCK=#ffffff][TABLE2][TR2][TD2][B]Дата:[/B] ${t(dt(v.date))}[/TD2][TD2][B]Сотрудник:[/B] ${t(v.off)}[/TD2][/TR2][/TABLE2][/BLOCK]`,
+  `[BLOCK=#f6f9f7]${rows(v.items).map((r,i)=>`${i+1})${ind(V(r,'v'))}`).join('')||'-'}[/BLOCK]`,FOOT)},
+
+card:{n:'Information Card: карточки подозреваемых',s:[
+ {t:'Подозреваемые (пустые карточки в код не попадут)',f:[
+  {k:'sus',l:'Подозреваемые',t:'list',cls:'big',min:4,rl:'Подозреваемый №',add:'Добавить подозреваемого',of:[
+   {k:'name',l:'Имя, Фамилия'},{k:'st',l:'Статус',t:'sel',o:['На свободе','Арестован','Мёртв']},
+   {k:'ph',l:'Телефон',ph:'XXX-XXXX'},{k:'adr',l:'Адрес',ph:'Улица, номер дома, район'},
+   {k:'car',l:'Транспорт',ph:'Марка, модель, цвет, номер'},{k:'sex',l:'Пол',t:'sel',o:['Мужской','Женский']},
+   {k:'race',l:'Раса'},{k:'rel',l:'Родственники'},
+   {k:'more',l:'Доп. информация',t:'area',cls:'big'}]}]}],
+ bb:v=>{
+  const card=(r,n)=>`[B][COLOR=#3d6b52]ПОДОЗРЕВАЕМЫЙ №${n}[/COLOR][/B]\n`+[['Имя, Фамилия','name'],['Статус','st'],['Телефон','ph'],['Адрес','adr'],['Транспорт','car'],['Пол','sex'],['Раса','race'],['Родственники','rel']].map(([l,k])=>`[B]${l}:[/B] ${t(r[k])}`).join('\n')+'\n[B]Доп. информация:[/B]'+((r.more||'').trim()?ind(r.more):' -');
+  const c=rows(v.sus).map((r,i)=>card(r,i+1)),o=[];
+  for(let i=0;i<c.length;i+=2)o.push(`[BLOCK=#f6f9f7][TABLE2][TR2][TD2]${c[i]}[/TD2][TD2]${c[i+1]||' '}[/TD2][/TR2][/TABLE2][/BLOCK]`);
+  return wrap(head('INFORMATION CARD'),...(o.length?o:['[BLOCK=#f6f9f7]-[/BLOCK]']),FOOT)}}
+};
+/* ===== Внешний вид документа на форуме: шаблоны. {ключ} = поле ввода, {*ключ} = список с кнопками ===== */
+const HD=t=>`<div class="blk b1"><div class="hd"><div><h2>${t}</h2><span class="g1">OPERATION SAFE STREETS BUREAU</span><span class="g2">LOS SANTOS COUNTY SHERIFF'S DEPARTMENT, SAN ANDREAS</span></div><img class="logo" src="${LOGO}" alt=""></div></div>`;
+const FT='<div class="ft">1120 WHITE AVE., LOS SANTOS, SA 90011<i>НЕСАНКЦИОНИРОВАННОЕ РАСПРОСТРАНЕНИЕ ПРЕСЛЕДУЕТСЯ ПО ЗАКОНУ</i></div>';
+const L=(l,k)=>`<div class="ln"><b>${l}:</b>{${k}}</div>`;
+const SH=(t,b,c='b1')=>`<div class="blk ${c}"><div class="sh">${t}</div>${b}</div>`;
+const DOCS={
+gang:`<div class="doc">${HD('GANG FILE')}<div class="blk b2"><div class="t2"><div>{id}</div><div class="r"><b class="stm">●</b> {status}</div><div><b>Открыто:</b> {open}</div><div><b>Закрыто:</b> {close}</div></div><div class="ln gap"><b>Сотрудники:</b></div>{*staff}</div>`+
+ SH('РЕГИСТРАЦИОННЫЕ ДАННЫЕ',L('Полное наименование','name')+L('Тип группировки','type'))+
+ SH('ХАРАКТЕРИСТИКА',L('Цвета и символика','colors')+L('Территория влияния','terr')+'<div class="ln"><b>Деятельность:</b></div>{act}','b2')+
+ SH('СВЯЗИ И КОНФЛИКТЫ','{*rel}')+SH('ПРЕСТУПНАЯ ДЕЯТЕЛЬНОСТЬ','{crime}','b2')+SH('СЛУЖЕБНЫЕ ОТМЕТКИ','{notes}')+FT+'</div>',
+report:`<div class="doc">${HD('OFFICIAL REPORT')}<div class="blk b2"><div class="t2"><div><b>Дата:</b> {date}</div><div><b>Сотрудник:</b> {off}</div></div></div><div class="blk b1">{*items}</div>${FT}</div>`,
+card:`<div class="doc">${HD('INFORMATION CARD')}{*sus}${FT}</div>`};
+const ROWT={
+ staff:()=>'<span class="bl">•</span>{v}',
+ rel:()=>'{type}{v}',
+ items:i=>`<b class="bl">${i+1})</b>{v}`,
+ sus:i=>`<div class="sh">ПОДОЗРЕВАЕМЫЙ №${i+1}</div>`+[['Имя, Фамилия','name'],['Статус','st'],['Телефон','ph'],['Адрес','adr'],['Транспорт','car'],['Пол','sex'],['Раса','race'],['Родственники','rel']].map(([l,k])=>L(l,k)).join('')+'<div class="ln"><b>Доп. информация:</b></div>{more}'};
+/* ===== Формы в стиле «зелёный бланк» (дело, участники, рапорт) ===== */
+const wrap2=(...p)=>`[SIZE=3][COLOR=#000000]${p.join('')}[/COLOR][/SIZE]`;
+const HDR2='[BLOCK=#005500][CENTER][COLOR=#ffffff][SIZE=5][B]ДЕТЕКТИВНЫЙ ДИВИЗИОН[/B][/SIZE]\nБЮРО-ОПЕРАЦИЯ «БЕЗОПАСНЫЕ УЛИЦЫ»[/COLOR][/CENTER][/BLOCK]';
+const bar2=s=>`[BLOCK=#b6ce5f][COLOR=#1e3a8a][B]${s}[/B][/COLOR][/BLOCK]`;
+const SEP2='[COLOR=#1e3a8a]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/COLOR]';
+const FT2=(c,u)=>`[BLOCK=#b6ce5f][CENTER][COLOR=#1e3a8a]Документ создан: ${t(dt(c))} | Последнее обновление: ${t(dt(u))}\n[SIZE=2]Несанкционированное распространение преследуется по закону[/SIZE][/COLOR][/CENTER][/BLOCK][BLOCK=#005500] [/BLOCK]`;
+const DATES=[{k:'cr',l:'Документ создан',t:'date',def:'today'},{k:'up',l:'Последнее обновление',t:'date',def:'today!'}];
+const PART=[['ИМЯ, ФАМИЛИЯ','name'],['КЛИЧКА','nick'],['ГРУППИРОВКА','gang'],['НОМЕР ТЕЛЕФОНА','ph'],['АДРЕС','adr'],['СРЕДСТВА ПЕРЕДВИЖЕНИЯ','car'],['ПОЛ','sex'],['РАСА','race'],['БЛИЖАЙШИЕ РОДСТВЕННИКИ','rel']];
+const EVID=[['Вещественные доказательства','ev1','Подробное описание изъятых улик'],['Свидетельские показания','ev2','Информация о свидетелях, их показаниях'],['Экспертные заключения','ev3','Результаты экспертиз'],['Оперативные материалы','ev4','Данные оперативной деятельности']];
+
+FORMS.case={n:'Дело: Case File (ДВР → OSSB)',s:[{t:'Дело',f:[
+ {k:'owner',l:'Имя фамилия сотрудника',ph:'Silvano Garcia',req:1},
+ {k:'cf',l:'Номер Кейс-Файла',ph:'CF-0000',req:1},
+ {k:'open',l:'Дата открытия',t:'date',req:1},
+ {k:'close',l:'Дата закрытия (пусто = в процессе)',t:'date'},
+ {k:'type',l:'Тип расследования',dl:['Уличное бандформирование','Организованная преступность','Оборот наркотиков','Незаконный оборот оружия','Другое']},
+ {k:'gf',l:'Связанные Gang File (GF-XXXX)',ph:'GF-0001, GF-0002'},
+ {k:'inv',l:'Детективы',t:'list',min:1,add:'Добавить детектива',of:[{k:'v',l:'Имя, должность',ph:'Silvano Garcia, Detective, Operation Safe Streets Bureau'}]},
+ {k:'charges',l:'Обвинения',t:'list',min:2,add:'Добавить обвинение',of:[{k:'v',l:'Обвинение: статья и пояснение',t:'area'}]},
+ {k:'desc',l:'Детальное описание произошедшего',t:'area',req:1},
+ {k:'src',l:'Заявитель / источник информации: ФИО, адрес, телефон, дата рождения'},
+ {k:'loc',l:'Локация'},{k:'idate',l:'Дата инцидента',t:'date'},{k:'itime',l:'Время',ph:'23:00'},
+ ...EVID.map(([l,k,ph])=>({k,l,ph,t:'area'})),...DATES]}],
+ bb:v=>wrap2(HDR2,'[BLOCK=#ffffff]'+SEP2+bar2('РЕГИСТРАЦИОННЫЕ ДАННЫЕ')+
+  `[B]Имя фамилия сотрудника:[/B] ${t(v.owner)}\n[B]Номер Кейс-Файла:[/B] ${t(v.cf)}\n[B]Дата открытия:[/B] ${t(dt(v.open))}\n[B]Дата закрытия:[/B] ${v.close?dt(v.close):'в процессе'}\n[B]Тип расследования:[/B] ${t(v.type)}\n[B]Связанные Gang File:[/B] ${t(v.gf)}\n[B]Ответственные детективы:[/B]${lst(rows(v.inv).map(r=>V(r,'v')))}`+
+  SEP2+bar2('ПРЕДЪЯВЛЯЕМЫЕ ОБВИНЕНИЯ')+(rows(v.charges).map((r,i)=>`${i+1}. ${V(r,'v')}`).join('\n')||'-')+'\n'+
+  SEP2+bar2('ОПИСАНИЕ ИНЦИДЕНТА')+`[B]Детальное описание произошедшего:[/B]${ind(v.desc)}[B]Заявитель / источник информации:[/B] ${t(v.src)}\n[B]Локация:[/B] ${t(v.loc)}, ${t(dt(v.idate))} в ${t(v.itime)}\n`+
+  SEP2+bar2('ДОКАЗАТЕЛЬНАЯ БАЗА')+EVID.map(([l,k])=>`[B]${l}:[/B]${ind(v[k])}`).join('')+'[/BLOCK]'+FT2(v.cr,v.up))};
+
+FORMS.people={n:'Участники дела (карточки участников)',s:[{t:'Участники',f:[
+ {k:'part',l:'Участники',t:'list',min:3,add:'Добавить участника',of:[
+  ...PART.slice(0,1).map(([l,k])=>({k,l:'Имя, Фамилия'})),
+  {k:'st',l:'Статус',t:'sel',o:['ПОДОЗРЕВАЕМЫЙ','СВИДЕТЕЛЬ','ПОТЕРПЕВШИЙ','ОБВИНЯЕМЫЙ']},
+  ...PART.slice(1).map(([l,k])=>({k,l:l[0]+l.slice(1).toLowerCase()})),
+  {k:'info',l:'Личная информация',t:'area'}]},...DATES]}],
+ bb:v=>{
+  const sc={'ПОДОЗРЕВАЕМЫЙ':'#4000BF','СВИДЕТЕЛЬ':'#008000','ПОТЕРПЕВШИЙ':'#b45309','ОБВИНЯЕМЫЙ':'#b22222'};
+  const card=(r,n)=>bar2(`УЧАСТНИК №${n}`)+`[B]ИМЯ, ФАМИЛИЯ:[/B] ${t(r.name)}\n[B]ТЕКУЩИЙ СТАТУС:[/B] [COLOR=${sc[r.st]||'#000000'}]${t(r.st)}[/COLOR]\n`+PART.slice(1).map(([l,k])=>`[B]${l}:[/B] ${t(r[k])}`).join('\n')+`\n[B]ЛИЧНАЯ ИНФОРМАЦИЯ:[/B]${ind(r.info)}`;
+  return wrap2(HDR2,'[BLOCK=#ffffff]'+SEP2+(rows(v.part).map((r,i)=>card(r,i+1)).join(SEP2)||'-')+'[/BLOCK]'+FT2(v.cr,v.up))}};
+
+FORMS.memo={n:'Служебный рапорт',s:[{t:'Рапорт',f:[
+ {k:'date',l:'Дата',t:'date',req:1,def:'today'},
+ {k:'num',l:'№ рапорта',ph:'1',req:1},
+ {k:'body',l:'Текст рапорта',t:'area',req:1},
+ {k:'att',l:'Приложения',t:'list',min:1,add:'Добавить приложение',of:[{k:'title',l:'Название спойлера',ph:'[CF-0000] Complaint'},{k:'text',l:'Содержимое приложения',t:'area'}]},
+ {k:'sign',l:'Подпись: должность и имя',ph:'Детектив Silvano Garcia',req:1}]}],
+ bb:v=>wrap2(HDR2,`[BLOCK=#b6ce5f][B]${t(dt(v.date))}[/B]\n[CENTER][SIZE=4][B]СЛУЖЕБНЫЙ РАПОРТ #${t(v.num)}[/B][/SIZE][/CENTER]${ind(v.body)}`+
+  rows(v.att).map(r=>`[SPOILER="${V(r,'title')||'Приложение'}"]${t(r.text)}[/SPOILER]`).join('')+
+  `[RIGHT][B]БЮРО-ОПЕРАЦИЯ «БЕЗОПАСНЫЕ УЛИЦЫ»[/B]\n[I]${t(v.sign)}[/I][/RIGHT][/BLOCK][BLOCK=#005500] [/BLOCK]`)};
+
+/* Внешний вид этих форм в редакторе */
+const H2='<div class="h2">ДЕТЕКТИВНЫЙ ДИВИЗИОН<small>БЮРО-ОПЕРАЦИЯ «БЕЗОПАСНЫЕ УЛИЦЫ»</small></div>';
+const B2=s=>`<div class="bar2">${s}</div>`,SP='<div class="sep">'+'━'.repeat(70)+'</div>';
+const F2='<div class="ft2"><div class="ln c"><b>Документ создан:</b>{cr}<b>| Последнее обновление:</b>{up}</div><small>Несанкционированное распространение преследуется по закону</small></div><div class="gl"></div>';
+DOCS.case=`<div class="doc">${H2}<div class="bd">${SP}${B2('РЕГИСТРАЦИОННЫЕ ДАННЫЕ')}${L('Имя фамилия сотрудника','owner')}${L('Номер Кейс-Файла','cf')}${L('Дата открытия','open')}${L('Дата закрытия','close')}${L('Тип расследования','type')}${L('Связанные Gang File','gf')}<div class="ln"><b>Ответственные детективы:</b></div>{*inv}${SP}${B2('ПРЕДЪЯВЛЯЕМЫЕ ОБВИНЕНИЯ')}{*charges}${SP}${B2('ОПИСАНИЕ ИНЦИДЕНТА')}<div class="ln"><b>Детальное описание произошедшего:</b></div>{desc}${L('Заявитель / источник информации','src')}<div class="ln"><b>Локация:</b>{loc}<b>Дата:</b>{idate}<b>Время:</b>{itime}</div>${SP}${B2('ДОКАЗАТЕЛЬНАЯ БАЗА')}${EVID.map(([l,k])=>`<div class="ln"><b>${l}:</b></div>{${k}}`).join('')}</div>${F2}</div>`;
+DOCS.people=`<div class="doc">${H2}<div class="bd">${SP}{*part}</div>${F2}</div>`;
+DOCS.memo=`<div class="doc">${H2}<div class="bd ol"><div class="ln"><b>Дата:</b>{date}</div><div class="memo-t">СЛУЖЕБНЫЙ РАПОРТ #{num}</div><div class="ln"><b>Текст:</b></div>{body}{*att}<div class="sg"><b>БЮРО-ОПЕРАЦИЯ «БЕЗОПАСНЫЕ УЛИЦЫ»</b><div class="ln r"><i>{sign}</i></div></div></div><div class="gl"></div></div>`;
+ROWT.inv=()=>'<span class="bl">•</span>{v}';
+ROWT.charges=i=>`<b class="bl">${i+1}.</b>{v}`;
+ROWT.part=i=>B2(`УЧАСТНИК №${i+1}`)+L('ИМЯ, ФАМИЛИЯ','name')+L('ТЕКУЩИЙ СТАТУС','st')+PART.slice(1).map(([l,k])=>L(l,k)).join('')+'<div class="ln"><b>ЛИЧНАЯ ИНФОРМАЦИЯ:</b></div>{info}'+SP;
+ROWT.att=()=>'<div class="ln"><b>Спойлер:</b>{title}</div>{text}';
+/*DOM*/
+const $=id=>document.getElementById(id),KEY='lscsd-ossb-';
+const E=(t,p={},...k)=>{const e=document.createElement(t);Object.assign(e,p);e.append(...k);return e};
+const ids=Object.keys(FORMS),sel=$('sel'),form=$('f'),out=$('out'),st=$('st');
+ids.forEach(i=>sel.append(E('option',{value:i},FORMS[i].n)));
+let cur,S,reqs=[],tried=false,dlN=0;
+const save=()=>{try{localStorage.setItem(KEY+cur,JSON.stringify(S))}catch(e){}};
+const TODAY=new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const flat=id=>FORMS[id].s.flatMap(x=>x.f);
+
+function ctl(f,o,top){
+  let el,dl=null;
+  if(f.t=='sel')el=E('select',{title:f.l},E('option',{value:''},f.l),...f.o.map(x=>E('option',{value:x},x)));
+  else if(f.t=='area'){el=E('textarea',{placeholder:f.ph||f.l,title:f.l,rows:3});const gr=()=>{el.style.height='auto';if(el.scrollHeight>20)el.style.height=el.scrollHeight+2+'px'};el.addEventListener('input',gr);setTimeout(gr,0)}
+  else{el=E('input',{type:f.t=='date'?'date':'text',placeholder:f.ph||f.l,title:f.l});
+    if(f.dl){const id='dl'+dlN++;el.setAttribute('list',id);dl=E('datalist',{id},...f.dl.map(x=>E('option',{value:x})))}}
+  if(f.def=='today!'||(f.def=='today'&&o[f.k]===undefined))o[f.k]=TODAY;
+  el.value=o[f.k]||'';
+  const on=()=>{o[f.k]=el.value;change()};el.addEventListener('input',on);el.addEventListener('change',on);
+  const err=E('span',{className:'err'}),w=E('span',{className:'slot'+(f.t=='area'?' ta':'')},el,err);
+  if(dl)w.append(dl);
+  if(top&&f.req)reqs.push({f,o,el,err});
+  return w;
+}
+function listCtl(f,o){
+  o[f.k]=o[f.k]||Array.from({length:f.min||1},()=>({}));
+  const box=E('div',{className:'lst'+(f.k=='sus'?' two':(f.k=='part'||f.k=='att'?' cards':''))}),add=E('button',{type:'button',className:'add'},'+ '+(f.add||'Добавить'));
+  const draw=()=>{box.textContent='';o[f.k].forEach((r,i)=>{
+    const rm=E('button',{type:'button',className:'rm',title:'Удалить'},'✕');
+    rm.onclick=()=>{o[f.k].splice(i,1);if(!o[f.k].length)o[f.k].push({});draw();change()};
+    box.append(E('div',{className:'rw'},expand(ROWT[f.k](i),f.of,r,0),rm))})};
+  add.onclick=()=>{o[f.k].push({});draw();change()};draw();
+  return E('div',{},box,add);
+}
+function expand(html,fields,o,top){
+  const d=E('div',{className:'xp'});
+  d.innerHTML=html.replace(/\{(\*?)(\w+)\}/g,(m,s,k)=>`<span class="ph" data-k="${k}" data-l="${s?1:0}"></span>`);
+  d.querySelectorAll('.ph').forEach(p=>{
+    const f=fields.find(x=>x.k==p.dataset.k);
+    p.replaceWith(p.dataset.l=='1'?listCtl(f,o):ctl(f,o,top));
+  });
+  return d;
+}
+function render(id){
+  cur=id;sel.value=id;
+  try{history.replaceState(null,'','?form='+id)}catch(e){}
+  try{S=JSON.parse(localStorage.getItem(KEY+id))||{}}catch(e){S={}}
+  form.textContent='';reqs=[];tried=false;
+  form.append(expand(DOCS[id],flat(id),S,1));
+  update();
+}
+function change(){save();update()}
+function update(){
+  out.value=FORMS[cur].bb(S);
+  const bad=reqs.filter(r=>!(S[r.f.k]||'').trim());
+  reqs.forEach(r=>{const b=tried&&!(S[r.f.k]||'').trim();r.el.classList.toggle('bad',b);r.err.textContent=b?' ←':''});
+  const sm=form.querySelector('.stm');if(sm)sm.style.color={'ЗАКРЫТО':'#b22222','ПРИОСТАНОВЛЕНО':'#9a6700'}[S.status]||'#3d6b52';
+  st.textContent=bad.length?`Не заполнено обязательных полей: ${bad.length}`:'Всё готово, можно копировать';
+  return bad[0];
+}
+async function copy(text,msg){
+  try{await navigator.clipboard.writeText(text)}catch(e){out.value=text;out.select();document.execCommand('copy')}
+  st.textContent=msg;
+}
+$('cb').onclick=()=>{tried=true;const b=update();if(b){b.el.scrollIntoView({block:'center',behavior:'smooth'});b.el.focus({preventScroll:true});return}
+  copy(FORMS[cur].bb(S),'ББ-код скопирован. Вставьте в редактор в режиме [ ]')};
+$('lnk').onclick=()=>copy(location.origin+location.pathname+'?form='+cur,'Ссылка на форму скопирована');
+$('clr').onclick=()=>{if(confirm('Очистить эту форму?')){S={};save();render(cur)}};
+sel.onchange=()=>render(sel.value);
+const q=new URLSearchParams(location.search).get('form')||location.hash.slice(1);
+render(FORMS[q]?q:ids[0]);
+</script>
+</body>
+</html>
